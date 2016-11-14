@@ -92,3 +92,5 @@ ENV/
 .idea/
 
 secrets.py
+
+*.sqlite3
