@@ -1,0 +1,16 @@
+{% extends 'base.html'  %}
+
+{% block content %}
+    {% if photos %}
+        <div>
+        {% for photo in photos %}
+            <a href="{{ photo_page_url(photo.owner, photo.id) }}">
+                <figure>
+                    <img src="{{ photo_url(photo) }}" alt="{{ photo.title }}">
+                    <figcaption>{{ photo.title }}</figcaption>
+                </figure>
+            </a>
+        {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}

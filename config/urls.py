@@ -16,6 +16,9 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 
+import flickr.views
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^$', flickr.views.PhotosView.as_view()),
 ]

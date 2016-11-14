@@ -1,3 +1,37 @@
 body {
-    background-color: antiquewhite;
+    background: #222;
+}
+
+div {
+    display: flex;
+    font-family: Avenir, Helvetica, sans-serif;
+    flex-flow: row wrap;
+}
+
+div img {
+    max-width: 500px;
+}
+
+div figure {
+    position: relative;
+    flex: 1;
+    font-size: 0;
+    overflow: hidden;
+    margin: 0;
+}
+
+div figure figcaption {
+    background: rgba(0, 0, 0, 0.3);
+    font-size: 1rem;
+    width: 100%;
+    color: #fff;
+    padding: .3rem;
+    position: absolute;
+    margin: 0;
+    transition: .2s;
+    top: -5rem;
+}
+
+div figure:hover figcaption {
+    transform: translateY(5rem);
 }
