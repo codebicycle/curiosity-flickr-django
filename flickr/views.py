@@ -1,11 +1,10 @@
 from django.shortcuts import render
 from django.views import View
 
-import flickrapi
-from config.settings import FLICKR_KEY, FLICKR_SECRET
 from flickr.utils import photo_url, photo_page_url
+from config.flickrapi import get_flickr
 
-flickr = flickrapi.FlickrAPI(FLICKR_KEY, FLICKR_SECRET, format='parsed-json')
+flickr = get_flickr()
 
 
 class PhotosView(View):
