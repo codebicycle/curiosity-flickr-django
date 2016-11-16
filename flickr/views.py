@@ -7,7 +7,7 @@ from config.flickrapi import get_flickr
 flickr = get_flickr()
 
 
-class PhotosView(View):
+class Interestingness(View):
     def get(self, request):
         res = flickr.interestingness.getList()
         photos = res['photos']['photo']

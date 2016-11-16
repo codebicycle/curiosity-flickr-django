@@ -20,5 +20,5 @@ import flickr.views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^$', flickr.views.PhotosView.as_view()),
+    url(r'^$', flickr.views.Interestingness.as_view()),
 ]
