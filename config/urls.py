@@ -21,4 +21,6 @@ import flickr.views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', flickr.views.Interestingness.as_view()),
+    url(r'^people$', flickr.views.PeopleView.as_view()),
+    url(r'^group$', flickr.views.GroupView.as_view(), name='group'),
 ]

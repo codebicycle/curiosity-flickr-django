@@ -1,16 +1,9 @@
 {% extends 'base.html'  %}
 
 {% block content %}
-    {% if photos %}
-        <div>
-        {% for photo in photos %}
-            <a href="{{ photo_page_url(photo.owner, photo.id) }}">
-                <figure>
-                    <img src="{{ photo_url(photo) }}" alt="{{ photo.title }}">
-                    <figcaption>{{ photo.title }}</figcaption>
-                </figure>
-            </a>
-        {% endfor %}
-        </div>
-    {% endif %}
+  {% if form %}
+    {% include 'flickr/_people_form.html' %}
+  {% endif %}
+
+  {% include 'flickr/_photos_gallery.html' %}
 {% endblock %}

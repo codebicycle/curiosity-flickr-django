@@ -1,0 +1,22 @@
+{% extends 'base.html'  %}
+
+{% block content %}
+  {% if form %}
+    {% include 'flickr/_people_form.html' %}
+  {% endif %}
+
+  <script>
+    var context = {
+      group_url: '{{ group_url }}',
+      groups: {{ groups|safe }},
+      userid: '{{ userid|safe }}',
+      csrf_token: '{{ csrf_token }}'
+    }
+  </script>
+  <script src="{{ static('js/group-ajax.js') }}"></script>
+
+  <div id="groups"></div>
+
+{#  <pre>{{ groups|pprint }}</pre>#}
+
+{% endblock %}
