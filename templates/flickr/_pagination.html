@@ -1,0 +1,22 @@
+{% if pages %}
+  <div class="pagination">
+    <span class="step-links">
+        {% if pages.has_previous() %}
+{#          <a href="?page={{ pages.previous_page_number() }}">previous</a>#}
+          <input form="people-form" type="hidden" value="{{ pages.previous_page_number() }}" name="page">
+          <button type="submit" form="people-form">&laquo;</button>
+        {% endif %}
+
+      <span class="current">
+            Page {{ pages.number }} of {{ pages.paginator.num_pages }}
+        </span>
+
+      {% if pages.has_next() %}
+{#        <a href="?page={{ pages.next_page_number() }}">next</a>#}
+        <input form="people-form" type="hidden" value="{{ pages.next_page_number() }}" name="page">
+        <button type="submit" form="people-form">&raquo;</button>
+      {% endif %}
+    </span>
+</div>
+
+{% endif %}

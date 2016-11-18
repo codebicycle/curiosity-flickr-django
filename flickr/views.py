@@ -1,12 +1,13 @@
 from urllib.parse import urlparse
 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render
 from django.views import View
 from flickrapi import FlickrError
 
+from config.flickrapi import get_flickr
 from flickr.utils import photo_url, photo_page_url
 from .forms import PeopleForm
-from config.flickrapi import get_flickr
 
 flickr = get_flickr()
 
@@ -28,9 +29,9 @@ class PeopleView(View):
     def get(self, request):
         form = PeopleForm()
         context = {
-            'form': form
+            'form': form,
         }
-        return render(request, 'flickr/photos.html', context)
+        return render(request, 'flickr/groups.html', context)
 
     def post(self, request):
         form = PeopleForm(request.POST)
@@ -40,13 +41,25 @@ class PeopleView(View):
         userid = self._userid(form.cleaned_data['user_id_or_url'])
         groups = flickr.people.getGroups(user_id=userid)
 
-        target_groups = groups['groups']['group'][:50]
+        group_list = groups['groups']['group']
+        paginator = Paginator(group_list, 25)
+
+        page = request.POST.get('page')
+        try:
+            pages = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            pages = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            pages = paginator.page(paginator.num_pages)
 
         context = {
             'form': form,
             'group_url': request.build_absolute_uri('group'),
             'userid': userid,
-            'groups': target_groups,
+            'groups': pages.object_list,
+            'pages': pages,
             'photo_url': photo_url,
             'photo_page_url': photo_page_url,
         }
