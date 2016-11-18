@@ -3,7 +3,7 @@
     $.each(context.groups, function (idx, group) {
         $.ajax({
             type: 'post',
-            url: context.group_url,
+            url: context.ajax_group_url,
             data: {
                 group: group,
                 userid: context.userid,
