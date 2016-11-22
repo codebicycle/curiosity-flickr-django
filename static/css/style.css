@@ -103,6 +103,7 @@ td {
 h4 {
     font-size: 13px;
     margin-bottom: 10px;
+    margin-left: 1rem;
 }
 
 p {
@@ -155,4 +156,8 @@ th {
 /* custom form */
 #id_user_id_or_url {
     width: 27em;
+}
+
+.pagination {
+    margin: 1rem;
 }

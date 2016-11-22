@@ -2,9 +2,7 @@
   <div class="pagination">
     <span class="step-links">
         {% if pages.has_previous() %}
-{#          <a href="?page={{ pages.previous_page_number() }}">previous</a>#}
-          <input form="people-form" type="hidden" value="{{ pages.previous_page_number() }}" name="page">
-          <button type="submit" form="people-form">&laquo;</button>
+          <a href="?page={{ pages.previous_page_number() }}">previous</a>
         {% endif %}
 
       <span class="current">
@@ -12,9 +10,7 @@
         </span>
 
       {% if pages.has_next() %}
-{#        <a href="?page={{ pages.next_page_number() }}">next</a>#}
-        <input form="people-form" type="hidden" value="{{ pages.next_page_number() }}" name="page">
-        <button type="submit" form="people-form">&raquo;</button>
+        <a href="?page={{ pages.next_page_number() }}">next</a>
       {% endif %}
     </span>
 </div>

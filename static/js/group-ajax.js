@@ -3,10 +3,9 @@
     $.each(context.groups, function (idx, group) {
         $.ajax({
             type: 'post',
-            url: context.ajax_group_url,
+            url: group.nsid,
             data: {
                 group: group,
-                userid: context.userid,
                 csrfmiddlewaretoken: context.csrf_token
             },
             success: ajax_success,

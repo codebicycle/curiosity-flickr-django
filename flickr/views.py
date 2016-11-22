@@ -1,7 +1,7 @@
 from urllib.parse import urlparse
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
 from flickrapi import FlickrError
 
@@ -39,31 +39,10 @@ class PeopleView(View):
             raise 'form not valid'
 
         userid = self._userid(form.cleaned_data['user_id_or_url'])
-        groups = flickr.people.getGroups(user_id=userid)
 
-        group_list = groups['groups']['group']
-        paginator = Paginator(group_list, 25)
 
-        page = request.POST.get('page')
-        try:
-            pages = paginator.page(page)
-        except PageNotAnInteger:
-            # If page is not an integer, deliver first page.
-            pages = paginator.page(1)
-        except EmptyPage:
-            # If page is out of range (e.g. 9999), deliver last page of results.
-            pages = paginator.page(paginator.num_pages)
-
-        context = {
-            'form': form,
-            'group_url': request.build_absolute_uri('group'),
-            'userid': userid,
-            'groups': pages.object_list,
-            'pages': pages,
-            'photo_url': photo_url,
-            'photo_page_url': photo_page_url,
-        }
-        return render(request, 'flickr/groups.html', context)
+        if 'submit_group_photos' in request.POST:
+            return redirect('groups', userid=userid)
 
     def _userid(self, param):
         """
@@ -81,10 +60,9 @@ class PeopleView(View):
         return userid
 
 
-class GroupView(View):
-    def post(self, request):
-        groupid = request.POST.get('group[nsid]')
-        userid = request.POST.get('userid')
+class UserGroupView(View):
+
+    def post(self, request, userid, groupid):
         groupname = request.POST.get('group[name]')
 
         photos = []
@@ -102,3 +80,31 @@ class GroupView(View):
             'photo_page_url': photo_page_url,
         }
         return render(request, 'flickr/_group.html', context)
+
+
+class UserGroupsView(View):
+
+    def get(self, request, userid):
+        groups = flickr.people.getGroups(user_id=userid)
+
+        group_list = groups['groups']['group']
+        paginator = Paginator(group_list, 25)
+
+        page = request.GET.get('page')
+        try:
+            pages = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            pages = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            pages = paginator.page(paginator.num_pages)
+
+        context = {
+            'userid': userid,
+            'groups': pages.object_list,
+            'pages': pages,
+            'photo_url': photo_url,
+            'photo_page_url': photo_page_url,
+        }
+        return render(request, 'flickr/groups.html', context)

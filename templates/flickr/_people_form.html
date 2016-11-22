@@ -1,7 +1,7 @@
 
 <div id="Main">
 
-  <h3><b>Most Viewed Photos</b></h3>
+  <h3><b>Curiosity Flickr</b></h3>
 
   <table border="0" cellpadding="0" cellspacing="0" width="100%">
     <tbody>
@@ -9,7 +9,7 @@
       <td width="60%">
         <h4>Arguments</h4>
 
-        <form action="" method="post" id="people-form">
+        <form method="post" id="people-form">
           {{ csrf_input }}
           <table id="Explorer" cellspacing="0" width="100%">
             <tbody>
@@ -18,8 +18,8 @@
           </table>
 
           <br>
-          <input type="submit" value="Top Photos">
-          <input type="submit" value="Group Photos">
+          <input type="submit" name="submit_top_photos" value="Top Photos">
+          <input type="submit" name="submit_group_photos" value="Group Photos">
         </form>
 
 
