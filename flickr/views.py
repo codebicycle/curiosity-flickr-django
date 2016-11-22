@@ -1,4 +1,5 @@
 from urllib.parse import urlparse
+import math
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, redirect
@@ -40,6 +41,8 @@ class PeopleView(View):
 
         userid = self._userid(form.cleaned_data['user_id_or_url'])
 
+        if 'submit_top_photos' in request.POST:
+            return redirect('top', userid=userid)
 
         if 'submit_group_photos' in request.POST:
             return redirect('groups', userid=userid)
@@ -108,3 +111,36 @@ class UserGroupsView(View):
             'photo_page_url': photo_page_url,
         }
         return render(request, 'flickr/groups.html', context)
+
+
+class UserTopView(View):
+
+    def get(self, request, userid):
+        user_info = flickr.people.getInfo(user_id=userid)
+        photo_count = user_info['person']['photos']['count']['_content']
+        user_name = user_info['person']['username']['_content']
+        photo_pages = math.ceil(photo_count / 500)
+        print('{} | {} photos | {} pages'
+              .format(user_name, photo_count, photo_pages))
+
+        # 40 * 500 = 20000
+        limit_photo_pages = min(40, photo_pages)
+        photos = []
+        for page in range(1, limit_photo_pages + 1):
+            print('page', page)
+            page_photos = flickr.people.getPhotos(user_id=userid,
+                                                  per_page=500,
+                                                  page=page,
+                                                  extras='date_upload, views'
+                                                  )
+            photos.extend(page_photos['photos']['photo'])
+
+        top_views = sorted(photos, reverse=True,
+                           key=(lambda x: int(x['views'])))[:200]
+
+        context = {
+            'photos': top_views,
+            'photo_url': photo_url,
+            'photo_page_url': photo_page_url,
+        }
+        return render(request, 'flickr/photos.html', context)

@@ -22,6 +22,8 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', flickr.views.Interestingness.as_view()),
     url(r'^people$', flickr.views.PeopleView.as_view()),
+    url(r'^people/(?P<userid>.*)/top',
+        flickr.views.UserTopView.as_view(), name='top'),
     url(r'^people/(?P<userid>.*)/groups$',
         flickr.views.UserGroupsView.as_view(), name='groups'),
     url(r'^people/(?P<userid>.*)/(?P<groupid>.*)$',
