@@ -49,11 +49,11 @@ class PeopleView(View):
 
     def _userid(self, param):
         """
-        :param: url or flickr user id
+        :param: flickr user url or flickr user id:
+                https://www.flickr.com/photos/jellybeanzgallery
+                or
                 38954353@N06
-                https://www.flickr.com/photos/jellybeanzgallery/29883393633/in/explore-2016-10-23/
-
-        :return: flickr user id
+        :return: flickr user id:
                 38954353@N06
         """
         parsed_url = urlparse(param)
