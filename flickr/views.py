@@ -14,6 +14,21 @@ from .models import Person
 flickr = get_flickr()
 
 
+def paginate(request=None, collection=None, per_page=100):
+    page = request.GET.get('page') if request is not None else 1
+    paginator = Paginator(collection, per_page)
+    try:
+        pages = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        pages = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        pages = paginator.page(paginator.num_pages)
+
+    return pages
+
+
 class Interestingness(View):
     def get(self, request):
         res = flickr.interestingness.getList()
@@ -90,17 +105,7 @@ class UserGroupsView(View):
         groups = flickr.people.getGroups(user_id=userid)
 
         group_list = groups['groups']['group']
-        paginator = Paginator(group_list, 25)
-
-        page = request.GET.get('page')
-        try:
-            pages = paginator.page(page)
-        except PageNotAnInteger:
-            # If page is not an integer, deliver first page.
-            pages = paginator.page(1)
-        except EmptyPage:
-            # If page is out of range (e.g. 9999), deliver last page of results.
-            pages = paginator.page(paginator.num_pages)
+        pages = paginate(request, collection=group_list, per_page=25)
 
         context = {
             'userid': userid,
@@ -126,16 +131,7 @@ class UserTopView(View):
         top_views = sorted(person.photos, reverse=True,
                            key=(lambda x: int(x['views'])))
 
-        paginator = Paginator(top_views, 100)
-        page = request.GET.get('page')
-        try:
-            pages = paginator.page(page)
-        except PageNotAnInteger:
-            # If page is not an integer, deliver first page.
-            pages = paginator.page(1)
-        except EmptyPage:
-            # If page is out of range (e.g. 9999), deliver last page of results.
-            pages = paginator.page(paginator.num_pages)
+        pages = paginate(request, collection=top_views,  per_page=100)
 
         context = {
             'photos': pages.object_list,
