@@ -65,7 +65,6 @@ class PeopleView(View):
 
 
 class UserGroupView(View):
-
     def post(self, request, userid, groupid):
         groupname = request.POST.get('group[name]')
 
@@ -87,7 +86,6 @@ class UserGroupView(View):
 
 
 class UserGroupsView(View):
-
     def get(self, request, userid):
         groups = flickr.people.getGroups(user_id=userid)
 
@@ -115,7 +113,6 @@ class UserGroupsView(View):
 
 
 class UserTopView(View):
-
     def get(self, request, userid):
         try:
             person = Person.objects.get(flickrid=userid)
@@ -150,19 +147,27 @@ class UserTopView(View):
 
     def _update_person(self, person):
         person.info = flickr.people.getInfo(user_id=person.flickrid)
-
-        photo_count = person.info['person']['photos']['count']['_content']
         user_name = person.info['person']['username']['_content']
-        photo_pages = math.ceil(photo_count / 500)
-        print('{} | {} photos | {} pages'
-              .format(user_name, photo_count, photo_pages))
 
-        person.photos = []
-        for page in range(1, photo_pages + 1):
+        first_page = self._get_photos(person.flickrid, person.updated_at,
+                                      page=1)
+        person.photos.extend(first_page['photos']['photo'])
+
+        pages = first_page['photos']['pages']
+        total = first_page['photos']['total']
+        print('{} | {} photos | {} pages'.format(user_name, total, pages))
+
+        for page in range(2, pages + 1):
             print('page', page)
-            page_photos = flickr.people.getPhotos(user_id=person.flickrid,
-                                                  per_page=500,
-                                                  page=page,
-                                                  extras='date_upload, views'
-                                                  )
-            person.photos.extend(page_photos['photos']['photo'])
+            current_page = self._get_photos(person.flickrid, person.updated_at,
+                                            page=page)
+            person.photos.extend(current_page['photos']['photo'])
+
+    def _get_photos(self, flickrid, min_upload_date, page=1):
+        response = flickr.people.getPhotos(user_id=flickrid,
+                                           per_page=500,
+                                           page=page,
+                                           extras='date_upload, views',
+                                           min_upload_date=min_upload_date
+                                           )
+        return response
