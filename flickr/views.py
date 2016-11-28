@@ -9,6 +9,7 @@ from flickrapi import FlickrError
 from config.flickrapi import get_flickr
 from flickr.utils import photo_url, photo_page_url
 from .forms import PeopleForm
+from .models import Person
 
 flickr = get_flickr()
 
@@ -116,26 +117,16 @@ class UserGroupsView(View):
 class UserTopView(View):
 
     def get(self, request, userid):
-        user_info = flickr.people.getInfo(user_id=userid)
-        photo_count = user_info['person']['photos']['count']['_content']
-        user_name = user_info['person']['username']['_content']
-        photo_pages = math.ceil(photo_count / 500)
-        print('{} | {} photos | {} pages'
-              .format(user_name, photo_count, photo_pages))
+        try:
+            person = Person.objects.get(flickrid=userid)
+        except Person.DoesNotExist as e:
+            person = Person(flickrid=userid)
 
-        # 40 * 500 = 20000
-        limit_photo_pages = min(40, photo_pages)
-        photos = []
-        for page in range(1, limit_photo_pages + 1):
-            print('page', page)
-            page_photos = flickr.people.getPhotos(user_id=userid,
-                                                  per_page=500,
-                                                  page=page,
-                                                  extras='date_upload, views'
-                                                  )
-            photos.extend(page_photos['photos']['photo'])
+        if person.needs_update:
+            self._update_person(person)
+            person.save()
 
-        top_views = sorted(photos, reverse=True,
+        top_views = sorted(person.photos, reverse=True,
                            key=(lambda x: int(x['views'])))[:200]
 
         context = {
@@ -144,3 +135,22 @@ class UserTopView(View):
             'photo_page_url': photo_page_url,
         }
         return render(request, 'flickr/photos.html', context)
+
+    def _update_person(self, person):
+        person.info = flickr.people.getInfo(user_id=person.flickrid)
+
+        photo_count = person.info['person']['photos']['count']['_content']
+        user_name = person.info['person']['username']['_content']
+        photo_pages = math.ceil(photo_count / 500)
+        print('{} | {} photos | {} pages'
+              .format(user_name, photo_count, photo_pages))
+
+        person.photos = []
+        for page in range(1, photo_pages + 1):
+            print('page', page)
+            page_photos = flickr.people.getPhotos(user_id=person.flickrid,
+                                                  per_page=500,
+                                                  page=page,
+                                                  extras='date_upload, views'
+                                                  )
+            person.photos.extend(page_photos['photos']['photo'])
