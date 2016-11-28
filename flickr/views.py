@@ -127,10 +127,22 @@ class UserTopView(View):
             person.save()
 
         top_views = sorted(person.photos, reverse=True,
-                           key=(lambda x: int(x['views'])))[:200]
+                           key=(lambda x: int(x['views'])))
+
+        paginator = Paginator(top_views, 100)
+        page = request.GET.get('page')
+        try:
+            pages = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            pages = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            pages = paginator.page(paginator.num_pages)
 
         context = {
-            'photos': top_views,
+            'photos': pages.object_list,
+            'pages': pages,
             'photo_url': photo_url,
             'photo_page_url': photo_page_url,
         }
