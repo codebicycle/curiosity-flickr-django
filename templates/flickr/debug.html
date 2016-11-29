@@ -1,0 +1,6 @@
+{% for key in context %}
+  <pre>
+    {{ key }}:
+    {{ context[key]|pprint }}
+  </pre>
+{% endfor %}

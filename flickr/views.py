@@ -1,17 +1,13 @@
 from urllib.parse import urlparse
-import math
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, redirect
 from django.views import View
 from flickrapi import FlickrError
 
-from config.flickrapi import get_flickr
-from flickr.utils import photo_url, photo_page_url
+from flickr.flickrutils import photo_url, photo_page_url
 from .forms import PeopleForm
-from .models import Person
-
-flickr = get_flickr()
+from .models import Person, FLICKR
 
 
 def paginate(request=None, collection=None, per_page=100):
@@ -31,7 +27,7 @@ def paginate(request=None, collection=None, per_page=100):
 
 class Interestingness(View):
     def get(self, request):
-        res = flickr.interestingness.getList()
+        res = FLICKR.interestingness.getList()
         photos = res['photos']['photo']
 
         context = {
@@ -66,7 +62,7 @@ class PeopleView(View):
     def _userid(self, param):
         """
         :param: flickr user url or flickr user id:
-                https://www.flickr.com/photos/jellybeanzgallery
+                https://www.FLICKR.com/photos/jellybeanzgallery
                 or
                 38954353@N06
         :return: flickr user id:
@@ -75,7 +71,7 @@ class PeopleView(View):
         parsed_url = urlparse(param)
         if not parsed_url.scheme:
             return param
-        userid = flickr.urls.lookupUser(url=param)['user']['id']
+        userid = FLICKR.urls.lookupUser(url=param)['user']['id']
         return userid
 
 
@@ -85,7 +81,7 @@ class UserGroupView(View):
 
         photos = []
         try:
-            group_photos = flickr.groups.pools.getPhotos(group_id=groupid,
+            group_photos = FLICKR.groups.pools.getPhotos(group_id=groupid,
                                                          user_id=userid)
             photos = group_photos['photos']['photo']
         except FlickrError as err:
@@ -102,7 +98,7 @@ class UserGroupView(View):
 
 class UserGroupsView(View):
     def get(self, request, userid):
-        groups = flickr.people.getGroups(user_id=userid)
+        groups = FLICKR.people.getGroups(user_id=userid)
 
         group_list = groups['groups']['group']
         pages = paginate(request, collection=group_list, per_page=25)
@@ -125,7 +121,7 @@ class UserTopView(View):
             person = Person(flickrid=userid)
 
         if person.needs_update:
-            self._update_person(person)
+            person.update()
             person.save()
 
         top_views = sorted(person.photos, reverse=True,
@@ -140,30 +136,3 @@ class UserTopView(View):
             'photo_page_url': photo_page_url,
         }
         return render(request, 'flickr/photos.html', context)
-
-    def _update_person(self, person):
-        person.info = flickr.people.getInfo(user_id=person.flickrid)
-        user_name = person.info['person']['username']['_content']
-
-        first_page = self._get_photos(person.flickrid, person.updated_at,
-                                      page=1)
-        person.photos.extend(first_page['photos']['photo'])
-
-        pages = first_page['photos']['pages']
-        total = first_page['photos']['total']
-        print('{} | {} photos | {} pages'.format(user_name, total, pages))
-
-        for page in range(2, pages + 1):
-            print('page', page)
-            current_page = self._get_photos(person.flickrid, person.updated_at,
-                                            page=page)
-            person.photos.extend(current_page['photos']['photo'])
-
-    def _get_photos(self, flickrid, min_upload_date, page=1):
-        response = flickr.people.getPhotos(user_id=flickrid,
-                                           per_page=500,
-                                           page=page,
-                                           extras='date_upload, views',
-                                           min_upload_date=min_upload_date
-                                           )
-        return response

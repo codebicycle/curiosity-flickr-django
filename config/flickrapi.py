@@ -3,7 +3,7 @@ from config.settings import (FLICKR_KEY, FLICKR_SECRET, FLICKR_ACCESS_TOKEN,
                              FLICKR_ACCESS_SECRET)
 
 
-def get_flickr():
+def init_flickr():
     access_token = flickrapi.auth.FlickrAccessToken(FLICKR_ACCESS_TOKEN,
                                                     FLICKR_ACCESS_SECRET,
                                                     'read')
