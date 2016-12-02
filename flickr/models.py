@@ -1,5 +1,5 @@
 import datetime
-
+import sys
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 
@@ -19,7 +19,7 @@ class Person(models.Model):
 
     flickrid = models.CharField(max_length=30, unique=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
-    photos = JSONField(default=[])
+    photos = JSONField(default=None)
     info = JSONField()
     needs_update = property(_needs_update)
 
@@ -33,6 +33,9 @@ class Person(models.Model):
     def _update_photos(self):
         user_name = self.info['person']['username']['_content']
         first_page = self._get_photo_page(page=1)
+
+        if self.photos is None:
+            self.photos = []
         self.photos.extend(first_page['photos']['photo'])
 
         pages = first_page['photos']['pages']
