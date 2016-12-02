@@ -1,0 +1,13 @@
+{% extends 'base.html'  %}
+
+{% block content %}
+  {% if not favs %}
+    <h3>Favorite list is empty.</h3>
+  {% endif %}
+
+  {% for person in favs %}
+    <h4><a href="{{ photostream_url(person.flickrid) }}">{{ person.username }}</a></h4>
+    {% set photos = person.photos %}
+    {% include 'flickr/_photos_gallery.html' %}
+  {% endfor %}
+{% endblock %}

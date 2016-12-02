@@ -3,11 +3,12 @@ from urllib.parse import urlparse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, redirect
 from django.views import View
+from django.views.generic import DeleteView
 from flickrapi import FlickrError
 
-from flickr.flickrutils import photo_url, photo_page_url
+from flickr.flickrutils import photo_url, photo_page_url, photostream_url
 from .forms import PeopleForm
-from .models import Person, FLICKR
+from .models import Person, FLICKR, Fav
 
 
 def paginate(request=None, collection=None, per_page=100):
@@ -58,6 +59,16 @@ class PeopleView(View):
 
         if 'submit_group_photos' in request.POST:
             return redirect('groups', userid=userid)
+
+        if 'submit_fav' in request.POST:
+            try:
+                person = Person.objects.get(flickrid=userid)
+            except Person.DoesNotExist as e:
+                person = Person(flickrid=userid)
+                person.update()
+
+            Fav.objects.get_or_create(person=person)
+            return redirect('fav')
 
     def _userid(self, param):
         """
@@ -122,7 +133,7 @@ class UserTopView(View):
 
         if person.needs_update:
             person.update()
-            person.save()
+
 
         top_views = sorted(person.photos, reverse=True,
                            key=(lambda x: int(x['views'])))
@@ -136,3 +147,35 @@ class UserTopView(View):
             'photo_page_url': photo_page_url,
         }
         return render(request, 'flickr/photos.html', context)
+
+
+class FavView(View):
+    def get(self, request):
+        favs = Fav.objects.all()
+
+        selection = []
+        for fav in favs:
+            if fav.person.needs_update:
+                fav.person.update()
+
+            person = fav.person
+            flickrid = person.flickrid
+            username = person.info['person']['username']['_content']
+            photos = person.photos
+            latest = sorted(photos, reverse=True,
+                            key=(lambda x: int(x['dateupload'])))[:10]
+
+            selection.append({
+                'flickrid': flickrid,
+                'username': username,
+                'photos': latest
+            })
+
+        context = {
+            'favs': selection,
+            'photo_url': photo_url,
+            'photo_page_url': photo_page_url,
+            'photostream_url': photostream_url,
+        }
+        # context = {'context': context}
+        return render(request, 'flickr/fav.html', context)

@@ -29,6 +29,7 @@ class Person(models.Model):
     def update(self):
         self.info = FLICKR.people.getInfo(user_id=self.flickrid)
         self._update_photos()
+        self.save()
 
     def _update_photos(self):
         user_name = self.info['person']['username']['_content']
@@ -55,3 +56,11 @@ class Person(models.Model):
                                              min_upload_date=self.updated_at
                                              )
         return photo_page
+
+
+class Fav(models.Model):
+    person = models.ForeignKey(Person, on_delete=models.CASCADE,
+                               to_field='flickrid')
+
+    def __str__(self):
+        return self.person.info['person']['username']['_content']
