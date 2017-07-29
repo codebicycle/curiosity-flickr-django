@@ -1,9 +1,4 @@
-Django==1.10.3
-flickrapi==2.1.2
+Django==1.11
+flickrapi==2.3
 Jinja2==2.8
-MarkupSafe==0.23
-oauthlib==2.0.0
-requests==2.11.1
-requests-oauthlib==0.7.0
-requests-toolbelt==0.7.0
-six==1.10.0
+psycopg2==2.7.3
