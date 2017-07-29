@@ -5,17 +5,18 @@
     {% include 'flickr/_people_form.html' %}
   {% endif %}
 
-  <script>
-    var context = {
-      groups: {{ groups|safe }},
-      csrf_token: '{{ csrf_token }}'
-    }
-  </script>
-  <script src="{{ static('js/group-ajax.js') }}"></script>
-
   <div id="groups"></div>
   {% include 'flickr/_pagination.html' %}
 
 {#  <pre>{{ groups|pprint }}</pre>#}
+{% endblock %}
 
+{% block scripts %}
+<script>
+  var context = {
+    groups: {{ groups|safe }},
+    csrf_token: '{{ csrf_token }}'
+  }
+</script>
+<script src="{{ static('js/group-ajax.js') }}"></script>
 {% endblock %}
