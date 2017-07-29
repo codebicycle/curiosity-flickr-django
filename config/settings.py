@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
-from .secrets import *
+from config.secrets import SECRET_KEY, DB_USER, DB_PASSWORD, FLICKR_KEY, FLICKR_SECRET
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -132,3 +132,5 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     'static',
 )
+
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
