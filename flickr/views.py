@@ -1,3 +1,4 @@
+import logging
 from urllib.parse import urlparse
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -9,6 +10,12 @@ from flickrapi import FlickrError
 from flickr.flickrutils import photo_url, photo_page_url, photostream_url
 from .forms import PeopleForm
 from .models import Person, FLICKR, Fav
+
+
+logging.basicConfig()
+
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
 
 
 def paginate(request=None, collection=None, per_page=100):
