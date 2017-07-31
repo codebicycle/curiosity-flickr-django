@@ -3,9 +3,8 @@ import sys
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 
-from config.flickrapi import init_flickr
 
-FLICKR = init_flickr()
+FLICKR = None
 
 
 class Person(models.Model):
