@@ -30,6 +30,8 @@ urlpatterns = [
     url(r'^people/(?P<userid>.*)/groups/?$',
         flickr.views.UserGroupsView.as_view(), name='groups'),
 
+    url(r'^people/(?P<userid>.*)/popular/?$', flickr.views.popular),
+
     url(r'^people/(?P<userid>.*)/(?P<groupid>.*)$',
         flickr.views.UserGroupView.as_view()),
 
@@ -37,4 +39,5 @@ urlpatterns = [
     url(r'^logout/$', flickr.views.logout),
     url(r'^hello/$', flickr.views.hello),
     url(r'^favs$', flickr.views.user_favs),
+    url(r'^popular/$', flickr.views.popular),
 ]

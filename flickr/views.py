@@ -308,3 +308,19 @@ def user_favs(request):
             'utils': flickr.flickrutils,
         }
     return render(request, 'flickr/favourites.html', context)
+
+
+# @require_flickr_auth
+def popular(request, userid=None):
+    f = init_flickrapi(request)
+
+    response = f.photos.getPopular(user_id=userid, sort='views', extras='views')
+    log.debug('Response\n{}'.format(pformat(response)))
+
+    photos = response['photos']['photo']
+
+    context = {
+            'photos': photos,
+            'utils': flickr.flickrutils,
+        }
+    return render(request, 'flickr/favourites.html', context)
