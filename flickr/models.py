@@ -23,16 +23,19 @@ class Person(models.Model):
         return False
 
     flickrid = models.CharField(max_length=30, unique=True, db_index=True)
-    updated_at = models.DateTimeField()
+    updated_at = models.DateTimeField(null=True)
     photos = JSONField(default=list)
-    info = JSONField()
+    info = JSONField(null=True)
     needs_update = property(_needs_update)
 
     def __str__(self):
         return self.info['person']['username']['_content']
 
-    def update(self):
+    def _update_info(self):
         self.info = self.flickrapi.people.getInfo(user_id=self.flickrid)
+
+    def update(self):
+        self._update_info()
         self._update_photos()
         self.updated_at = datetime.datetime.utcnow()
         self.save()
