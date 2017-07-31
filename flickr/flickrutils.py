@@ -61,3 +61,20 @@ def photosets_url(userid):
 def photoset_url(userid=None, photosetid=None):
     return 'https://www.flickr.com/photos/{userid}/sets/{photosetid}'.format(
         userid=userid, photosetid=photosetid)
+
+
+def cool_number(value, num_decimals=1):
+    """Filter to convert regular numbers to a
+    cool format (ie: 2K, 434.4K, 33M...)
+    :param value: number
+    :param num_decimals: Number of decimal digits
+
+    """
+    int_value = int(value)
+    formatted_number = '{{:.{}f}}'.format(num_decimals)
+    if int_value < 1000:
+        return str(int_value)
+    elif int_value < 1000000:
+        return formatted_number.format(int_value/1000.0).rstrip('0.') + 'K'
+    else:
+        return formatted_number.format(int_value/1000000.0).rstrip('0.') + 'M'
