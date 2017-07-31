@@ -1,11 +1,13 @@
 import logging
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlencode, parse_qs, urlunparse, unquote
 
+from django.conf import settings
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import render, redirect, reverse
 from django.views import View
 from django.views.generic import DeleteView
-from flickrapi import FlickrError
+from flickrapi import FlickrAPI, FlickrError
 
 from flickr.flickrutils import photo_url, photo_page_url, photostream_url
 from .forms import PeopleForm
@@ -127,7 +129,7 @@ class UserGroupsView(View):
             'pages': pages,
             'photo_url': photo_url,
             'photo_page_url': photo_page_url,
-        }
+    }
         return render(request, 'flickr/groups.html', context)
 
 
@@ -186,3 +188,96 @@ class FavView(View):
         }
         # context = {'context': context}
         return render(request, 'flickr/fav.html', context)
+
+
+def require_flickr_auth(view):
+    """"View decorator, redirects users to Flickr when no access token found."""
+
+    def protected_view(request, *args, **kwargs):
+        token = request.session.get('token')
+
+        f = FlickrAPI(settings.FLICKR_KEY, settings.FLICKR_SECRET,
+            token=token, store_token=False)
+
+        if token is None:
+            callback_url = build_callback_url(request)
+            f.get_request_token(oauth_callback=callback_url)
+
+            authorize_url = f.auth_url(perms='read')
+            log.debug('authorize URL: {}'.format(authorize_url))
+
+            request.session['request_token'] = f.flickr_oauth.resource_owner_key
+            request.session['request_token_secret'] = f.flickr_oauth.resource_owner_secret
+            request.session['requested_permissions'] = f.flickr_oauth.requested_permissions
+
+            return HttpResponseRedirect(authorize_url)
+
+        return view(request, *args, **kwargs)
+
+    return protected_view
+
+
+def build_callback_url(request):
+    next_url = request.get_full_path()
+    callback_url = request.build_absolute_uri(reverse('flickr-auth'))
+    callback_url = set_query_param(callback_url, 'next', next_url)
+    callback_url = unquote(callback_url)
+    log.debug('callback URL: {}'.format(callback_url))
+    return callback_url
+
+
+def set_query_param(url, key, value):
+    parts = list(urlparse(url))
+    query_dict = parse_qs(parts[4])
+    query_dict[key] = value
+    parts[4] = urlencode(query_dict, doseq=True)
+    new_url = urlunparse(parts)
+    return new_url
+
+
+def flickr_auth(request):
+    redirect_url = request.GET['next']
+    log.debug('redirect URL: {}'.format(redirect_url))
+
+    verifier = request.GET.get('oauth_verifier')
+    log.debug('verifier: {}'.format(verifier))
+
+    f = FlickrAPI(settings.FLICKR_KEY, settings.FLICKR_SECRET,
+        token=None, store_token=False)
+
+    f.flickr_oauth.resource_owner_key = request.session['request_token']
+    f.flickr_oauth.resource_owner_secret = request.session['request_token_secret']
+    f.flickr_oauth.requested_permissions = request.session['requested_permissions']
+    del request.session['request_token']
+    del request.session['request_token_secret']
+    del request.session['requested_permissions']
+
+    f.get_access_token(verifier)
+
+    token = f.token_cache.token
+    log.debug('token: {}'.format(token.__dict__))
+
+    request.session['token'] = token
+
+    return redirect(redirect_url)
+
+
+@require_flickr_auth
+def hello(request):
+    return HttpResponse('Hello')
+
+
+def logout(request):
+    if 'token' in request.session:
+        del request.session['token']
+
+    return redirect('/')
+
+
+def init_flickrapi(request):
+    token = request.session.get('token')
+
+    f = FlickrAPI(settings.FLICKR_KEY, settings.FLICKR_SECRET,
+        token=token, store_token=False, format='parsed-json')
+
+    return f

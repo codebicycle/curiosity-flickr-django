@@ -32,4 +32,8 @@ urlpatterns = [
 
     # url(r'^people/(?P<userid>.*)/(?P<groupid>.*)$',
     #     flickr.views.UserGroupView.as_view()),
+
+    url(r'^flickr-auth/$', flickr.views.flickr_auth, name='flickr-auth'),
+    url(r'^logout/$', flickr.views.logout),
+    url(r'^hello/$', flickr.views.hello),
 ]
