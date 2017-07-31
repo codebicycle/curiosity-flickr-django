@@ -310,11 +310,15 @@ def user_favs(request):
     return render(request, 'flickr/favourites.html', context)
 
 
-# @require_flickr_auth
+@require_flickr_auth
 def popular(request, userid=None):
-    f = init_flickrapi(request)
+    """sort : faves, views, comments or interesting. Deafults to interesting."""
 
-    response = f.photos.getPopular(user_id=userid, sort='views', extras='views')
+    f = init_flickrapi(request)
+    page = request.GET.get('page', 1)
+    sort = request.GET.get('sort', 'views')
+
+    response = f.photos.getPopular(user_id=userid, sort=sort, extras='views', page=page)
     log.debug('Response\n{}'.format(pformat(response)))
 
     photos = response['photos']['photo']
