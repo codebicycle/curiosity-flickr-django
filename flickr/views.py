@@ -1,5 +1,5 @@
 import logging
-from urllib.parse import urlparse, urlencode, parse_qs, urlunparse, unquote
+from urllib.parse import unquote
 
 from django.conf import settings
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -10,6 +10,7 @@ from django.views.generic import DeleteView
 from flickrapi import FlickrAPI, FlickrError
 
 from flickr.flickrutils import photo_url, photo_page_url, photostream_url
+from flickr.utils import set_query_param
 from .forms import PeopleForm
 from .models import Person, FLICKR, Fav
 
@@ -190,6 +191,8 @@ class FavView(View):
         return render(request, 'flickr/fav.html', context)
 
 
+# Flickr auth
+
 def require_flickr_auth(view):
     """"View decorator, redirects users to Flickr when no access token found."""
 
@@ -224,15 +227,6 @@ def build_callback_url(request):
     callback_url = unquote(callback_url)
     log.debug('callback URL: {}'.format(callback_url))
     return callback_url
-
-
-def set_query_param(url, key, value):
-    parts = list(urlparse(url))
-    query_dict = parse_qs(parts[4])
-    query_dict[key] = value
-    parts[4] = urlencode(query_dict, doseq=True)
-    new_url = urlunparse(parts)
-    return new_url
 
 
 def flickr_auth(request):
