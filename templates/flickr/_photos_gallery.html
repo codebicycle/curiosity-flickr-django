@@ -1,12 +1,28 @@
 {% if photos %}
-    <div class="gallery">
-    {% for photo in photos %}
-        <a href="{{ utils.photo_page_url(photo.owner, photo.id) }}">
-            <figure>
-                <img src="{{ utils.photo_url(photo) }}" alt="{{ photo.title }}">
-                <figcaption>{{ photo.title }}</figcaption>
-            </figure>
-        </a>
-    {% endfor %}
-    </div>
+<div class="gallery">
+  {% for photo in photos %}
+
+  <figure>
+    <a href="{{ utils.photo_page_url(photo.owner, photo.id) }}">
+      <img src="{{ utils.photo_url(photo) }}" alt="{{ photo.title }}">
+    </a>
+    <figcaption class="row">
+      <div class="col">
+        <div class="row">
+          <span>{{ photo.title }}</span>
+        </div>
+        <div class="row">
+          <span>by <a href="{{ utils.photostream_url(photo.owner) }}"
+            class="success">{{ photo.ownername }}</a></span>
+        </div>
+      </div>
+
+      <div class="align-self-end">
+        <span>{{ utils.cool_number(photo.views) }}</span>
+      </div>
+    </figcaption>
+
+  </figure>
+  {% endfor %}
+</div>
 {% endif %}

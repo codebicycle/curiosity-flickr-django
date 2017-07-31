@@ -15,14 +15,13 @@ body {
 
 .gallery figure {
     position: relative;
-    flex: 1;
     font-size: 0;
     overflow: hidden;
     margin: 0;
 }
 
 .gallery figure figcaption {
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.5);
     font-size: 1rem;
     width: 100%;
     color: #fff;
@@ -160,4 +159,15 @@ th {
 
 .pagination {
     margin: 1rem;
+}
+
+figcaption a,
+figcaption a:link {
+    color: hsla(0,0%,100%,.7);
+    font-size: 1rem;
+    transition: color .15s linear;
+}
+
+figcaption a:hover {
+    color: white;
 }

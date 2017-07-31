@@ -308,7 +308,7 @@ def favs(request, userid=None):
     f = init_flickrapi(request)
     page = request.GET.get('page', 1)
 
-    response = f.favorites.getList(user_id=userid, page=page)
+    response = f.favorites.getList(user_id=userid, page=page, extras='owner_name,views')
     log.debug('Response\n{}'.format(pformat(response)))
 
     photos = response['photos']['photo']
@@ -328,7 +328,8 @@ def popular(request, userid=None):
     page = request.GET.get('page', 1)
     sort = request.GET.get('sort', 'views')
 
-    response = f.photos.getPopular(user_id=userid, sort=sort, extras='views', page=page)
+    response = f.photos.getPopular(user_id=userid, sort=sort,
+        page=page, extras='owner_name,views')
     log.debug('Response\n{}'.format(pformat(response)))
 
     photos = response['photos']['photo']
