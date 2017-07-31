@@ -82,6 +82,13 @@ class PeopleView(View):
             # Fav.objects.get_or_create(person=person)
             # return redirect('fav')
 
+        if 'submit_favs' in request.POST:
+            return redirect('favs', userid=userid)
+
+        if 'submit_popular' in request.POST:
+            return redirect('popular', userid=userid)
+
+
     def _userid(self, param, request):
         """
         :param: flickr user url or flickr user id:
@@ -313,7 +320,7 @@ def favs(request, userid=None):
 
 @require_flickr_auth
 def popular(request, userid=None):
-    """sort : faves, views, comments or interesting. Deafults to interesting."""
+    """sort : faves, views, comments or interesting. Deafults to views."""
 
     f = init_flickrapi(request)
     page = request.GET.get('page', 1)
