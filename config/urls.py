@@ -21,17 +21,17 @@ import flickr.views
 urlpatterns = [
     # url(r'^admin/', admin.site.urls),
     url(r'^$', flickr.views.Interestingness.as_view()),
-    # url(r'^people/$', flickr.views.PeopleView.as_view(), name='people'),
+    url(r'^people/$', flickr.views.PeopleView.as_view(), name='people'),
     # url(r'^people/fav/$', flickr.views.FavView.as_view(), name='fav'),
 
     # url(r'^people/(?P<userid>.*)/top',
     #     flickr.views.UserTopView.as_view(), name='top'),
 
-    # url(r'^people/(?P<userid>.*)/groups$',
-    #     flickr.views.UserGroupsView.as_view(), name='groups'),
+    url(r'^people/(?P<userid>.*)/groups$',
+        flickr.views.UserGroupsView.as_view(), name='groups'),
 
-    # url(r'^people/(?P<userid>.*)/(?P<groupid>.*)$',
-    #     flickr.views.UserGroupView.as_view()),
+    url(r'^people/(?P<userid>.*)/(?P<groupid>.*)$',
+        flickr.views.UserGroupView.as_view()),
 
     url(r'^flickr-auth/$', flickr.views.flickr_auth, name='flickr-auth'),
     url(r'^logout/$', flickr.views.logout),

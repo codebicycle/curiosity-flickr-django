@@ -1,5 +1,5 @@
 import logging
-from urllib.parse import unquote
+from urllib.parse import unquote, urlparse
 from pprint import pformat
 
 from django.conf import settings
@@ -63,9 +63,9 @@ class PeopleView(View):
     def post(self, request):
         form = PeopleForm(request.POST)
         if not form.is_valid():
-            raise 'form not valid'
+            raise 'Form not valid.'
 
-        userid = self._userid(form.cleaned_data['user_id_or_url'])
+        userid = self._userid(form.cleaned_data['user_id_or_url'], request)
 
         if 'submit_top_photos' in request.POST:
             return redirect('top', userid=userid)
@@ -74,16 +74,17 @@ class PeopleView(View):
             return redirect('groups', userid=userid)
 
         if 'submit_fav' in request.POST:
-            try:
-                person = Person.objects.get(flickrid=userid)
-            except Person.DoesNotExist as e:
-                person = Person(flickrid=userid)
-                person.update()
+            pass
+            # try:
+            #     person = Person.objects.get(flickrid=userid)
+            # except Person.DoesNotExist as e:
+            #     person = Person(flickrid=userid)
+            #     person.update()
 
-            Fav.objects.get_or_create(person=person)
-            return redirect('fav')
+            # Fav.objects.get_or_create(person=person)
+            # return redirect('fav')
 
-    def _userid(self, param):
+    def _userid(self, param, request):
         """
         :param: flickr user url or flickr user id:
                 https://www.FLICKR.com/photos/jellybeanzgallery
@@ -92,10 +93,13 @@ class PeopleView(View):
         :return: flickr user id:
                 38954353@N06
         """
-        parsed_url = urlparse(param)
-        if not parsed_url.scheme:
+        parts = urlparse(param)
+        if not parts.scheme:
             return param
-        userid = FLICKR.urls.lookupUser(url=param)['user']['id']
+
+        f = init_flickrapi(request)
+        response = f.urls.lookupUser(url=param)
+        userid = response['user']['id']
         return userid
 
 
@@ -103,36 +107,38 @@ class UserGroupView(View):
     def post(self, request, userid, groupid):
         groupname = request.POST.get('group[name]')
 
+        f = init_flickrapi(request)
         photos = []
         try:
-            group_photos = FLICKR.groups.pools.getPhotos(group_id=groupid,
-                                                         user_id=userid)
-            photos = group_photos['photos']['photo']
+            response = f.groups.pools.getPhotos(group_id=groupid, user_id=userid)
+            photos = response['photos']['photo']
         except FlickrError as err:
-            print(err, groupname)
+            log.error('{} {}'.format(err, groupname))
 
         context = {
             'groupname': groupname,
             'photos': photos,
-            'photo_url': photo_url,
-            'photo_page_url': photo_page_url,
+            'utils': flickr.flickrutils,
         }
         return render(request, 'flickr/_group.html', context)
 
 
 class UserGroupsView(View):
     def get(self, request, userid):
-        groups = FLICKR.people.getGroups(user_id=userid)
+        f = init_flickrapi(request)
 
-        group_list = groups['groups']['group']
+        response = f.people.getGroups(user_id=userid)
+
+        group_list = response['groups']['group']
+        log.debug('Groups of {}:\n{}'.format(userid, pformat(group_list)))
+
         pages = paginate(request, collection=group_list, per_page=25)
 
         context = {
             'userid': userid,
             'groups': pages.object_list,
             'pages': pages,
-            'photo_url': photo_url,
-            'photo_page_url': photo_page_url,
+            'utils': flickr.flickrutils,
     }
         return render(request, 'flickr/groups.html', context)
 
@@ -287,7 +293,7 @@ def user_favs(request):
     f = init_flickrapi(request)
 
     response = f.favorites.getList()
-    log.debug('Response\n{}}'.format(pformat(response)))
+    log.debug('Response\n{}'.format(pformat(response)))
 
     photos = response['photos']['photo']
 
