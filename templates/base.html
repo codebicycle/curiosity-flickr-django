@@ -3,16 +3,34 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+
     <link rel="stylesheet" href="{{ static('css/style.css') }}">
 
     <title>Curiosity Flickr</title>
   </head>
   <body>
+
+    <nav class="navbar navbar-light bg-faded mb-4">
+      <form action='/people/' method="post" class="form-inline">
+        {{ csrf_input }}
+        <input class="form-control col-6" id="navbar-input" type="text" name="user_id_or_url" placeholder="User id or URL">
+
+        <button class="btn btn-outline-success btn-sm ml-2" type="submit" name="submit_popular">Popular</button>
+        <button class="btn btn-outline-success btn-sm ml-2" type="submit" name="submit_favs">Favourites</button>
+        <button class="btn btn-outline-success btn-sm ml-2" type="submit" name="submit_group_photos">Groups Photos</button>
+        <button class="btn btn-outline-success btn-sm ml-2" type="submit" name="submit_fav_user">Favourite User</button>
+      </form>
+    </nav>
+
     {% block content %}{% endblock %}
 
-    <script src="https://code.jquery.com/jquery-2.2.4.min.js"
-      integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
-      crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
 
     {% block scripts %}{% endblock %}
   </body>
