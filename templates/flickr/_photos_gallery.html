@@ -1,9 +1,9 @@
 {% if photos %}
     <div class="gallery">
     {% for photo in photos %}
-        <a href="{{ photo_page_url(photo.owner, photo.id) }}">
+        <a href="{{ utils.photo_page_url(photo.owner, photo.id) }}">
             <figure>
-                <img src="{{ photo_url(photo) }}" alt="{{ photo.title }}">
+                <img src="{{ utils.photo_url(photo) }}" alt="{{ photo.title }}">
                 <figcaption>{{ photo.title }}</figcaption>
             </figure>
         </a>

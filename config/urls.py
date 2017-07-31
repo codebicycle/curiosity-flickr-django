@@ -36,4 +36,5 @@ urlpatterns = [
     url(r'^flickr-auth/$', flickr.views.flickr_auth, name='flickr-auth'),
     url(r'^logout/$', flickr.views.logout),
     url(r'^hello/$', flickr.views.hello),
+    url(r'^favs$', flickr.views.user_favs),
 ]

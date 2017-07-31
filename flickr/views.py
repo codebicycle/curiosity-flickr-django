@@ -1,5 +1,6 @@
 import logging
 from urllib.parse import unquote
+from pprint import pformat
 
 from django.conf import settings
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -10,6 +11,7 @@ from django.views.generic import DeleteView
 from flickrapi import FlickrAPI, FlickrError
 
 from flickr.flickrutils import photo_url, photo_page_url, photostream_url
+import flickr.flickrutils
 from flickr.utils import set_query_param
 from .forms import PeopleForm
 from .models import Person, FLICKR, Fav
@@ -275,3 +277,21 @@ def init_flickrapi(request):
         token=token, store_token=False, format='parsed-json')
 
     return f
+
+
+# Flickr API calls
+
+@require_flickr_auth
+def user_favs(request):
+    f = init_flickrapi(request)
+
+    response = f.favorites.getList()
+    log.debug('Response\n{}}'.format(pformat(response)))
+
+    photos = response['photos']['photo']
+
+    context = {
+            'photos': photos,
+            'utils': flickr.flickrutils,
+        }
+    return render(request, 'flickr/favourites.html', context)

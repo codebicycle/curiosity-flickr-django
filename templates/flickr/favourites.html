@@ -1,0 +1,10 @@
+{% extends 'base.html'  %}
+
+{% block content %}
+  {% if not photos %}
+    <h3>Favorite list is empty.</h3>
+  {% endif %}
+
+  {% include 'flickr/_photos_gallery.html' %}
+
+{% endblock %}
