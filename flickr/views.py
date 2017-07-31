@@ -84,7 +84,7 @@ class PeopleView(View):
             Fav.objects.get_or_create(person=person)
             return redirect('fav-users')
 
-        if 'submit_fav' in request.POST:
+        if 'submit_favs' in request.POST:
             return redirect('favs', userid=userid)
 
         if 'submit_popular' in request.POST:
