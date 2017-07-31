@@ -24,10 +24,10 @@ urlpatterns = [
     url(r'^people/$', flickr.views.PeopleView.as_view(), name='people'),
     # url(r'^people/fav/$', flickr.views.FavView.as_view(), name='fav'),
 
-    # url(r'^people/(?P<userid>.*)/top',
-    #     flickr.views.UserTopView.as_view(), name='top'),
+    url(r'^people/(?P<userid>.*)/top/?$',
+        flickr.views.UserTopView.as_view(), name='top'),
 
-    url(r'^people/(?P<userid>.*)/groups$',
+    url(r'^people/(?P<userid>.*)/groups/?$',
         flickr.views.UserGroupsView.as_view(), name='groups'),
 
     url(r'^people/(?P<userid>.*)/(?P<groupid>.*)$',
