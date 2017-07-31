@@ -71,18 +71,20 @@ class PeopleView(View):
         if 'submit_group_photos' in request.POST:
             return redirect('groups', userid=userid)
 
+        if 'submit_fav_user' in request.POST:
+            Person.flickrapi = init_flickrapi(request)
+
+            try:
+                person = Person.objects.get(flickrid=userid)
+            except Person.DoesNotExist as e:
+                person = Person(flickrid=userid)
+                person._update_info()
+                person.save()
+
+            Fav.objects.get_or_create(person=person)
+            return redirect('fav-users')
+
         if 'submit_fav' in request.POST:
-            pass
-            # try:
-            #     person = Person.objects.get(flickrid=userid)
-            # except Person.DoesNotExist as e:
-            #     person = Person(flickrid=userid)
-            #     person.update()
-
-            # Fav.objects.get_or_create(person=person)
-            # return redirect('fav')
-
-        if 'submit_favs' in request.POST:
             return redirect('favs', userid=userid)
 
         if 'submit_popular' in request.POST:
@@ -181,36 +183,36 @@ class UserTopView(View):
         return render(request, 'flickr/photos.html', context)
 
 
-class FavView(View):
-    def get(self, request):
-        favs = Fav.objects.all()
+# class FavView(View):
+#     def get(self, request):
+#         favs = Fav.objects.all()
 
-        selection = []
-        for fav in favs:
-            if fav.person.needs_update:
-                fav.person.update()
+#         selection = []
+#         for fav in favs:
+#             if fav.person.needs_update:
+#                 fav.person.update()
 
-            person = fav.person
-            flickrid = person.flickrid
-            username = person.info['person']['username']['_content']
-            photos = person.photos
-            latest = sorted(photos, reverse=True,
-                            key=(lambda x: int(x['dateupload'])))[:10]
+#             person = fav.person
+#             flickrid = person.flickrid
+#             username = person.info['person']['username']['_content']
+#             photos = person.photos
+#             latest = sorted(photos, reverse=True,
+#                             key=(lambda x: int(x['dateupload'])))[:10]
 
-            selection.append({
-                'flickrid': flickrid,
-                'username': username,
-                'photos': latest
-            })
+#             selection.append({
+#                 'flickrid': flickrid,
+#                 'username': username,
+#                 'photos': latest
+#             })
 
-        context = {
-            'favs': selection,
-            'photo_url': photo_url,
-            'photo_page_url': photo_page_url,
-            'photostream_url': photostream_url,
-        }
-        # context = {'context': context}
-        return render(request, 'flickr/fav.html', context)
+#         context = {
+#             'favs': selection,
+#             'photo_url': photo_url,
+#             'photo_page_url': photo_page_url,
+#             'photostream_url': photostream_url,
+#         }
+#         # context = {'context': context}
+#         return render(request, 'flickr/fav.html', context)
 
 
 # Flickr auth
@@ -336,3 +338,14 @@ def popular(request, userid=None):
             'utils': flickr.flickrutils,
         }
     return render(request, 'flickr/photos.html', context)
+
+
+def fav_users(request):
+    favs = Fav.objects.all()
+
+    context = {
+        'favs': favs,
+        'utils': flickr.flickrutils,
+    }
+
+    return render(request, 'flickr/fav_users.html', context)
