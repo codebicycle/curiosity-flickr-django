@@ -295,10 +295,11 @@ def init_flickrapi(request):
 # Flickr API calls
 
 @require_flickr_auth
-def user_favs(request):
+def favs(request, userid=None):
     f = init_flickrapi(request)
+    page = request.GET.get('page', 1)
 
-    response = f.favorites.getList()
+    response = f.favorites.getList(user_id=userid, page=page)
     log.debug('Response\n{}'.format(pformat(response)))
 
     photos = response['photos']['photo']
