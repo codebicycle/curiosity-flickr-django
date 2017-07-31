@@ -19,8 +19,9 @@ from django.contrib import admin
 import flickr.views
 
 urlpatterns = [
-    # url(r'^admin/', admin.site.urls),
-    url(r'^$', flickr.views.Interestingness.as_view()),
+    url(r'^admin/', admin.site.urls),
+    url(r'^$', flickr.views.PeopleView.as_view()),
+    url(r'^interesting/$', flickr.views.Interestingness.as_view()),
     url(r'^people/$', flickr.views.PeopleView.as_view(), name='people'),
     # url(r'^people/fav/$', flickr.views.FavView.as_view(), name='fav'),
 
