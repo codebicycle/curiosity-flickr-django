@@ -315,7 +315,7 @@ def favs(request, userid=None):
             'photos': photos,
             'utils': flickr.flickrutils,
         }
-    return render(request, 'flickr/favourites.html', context)
+    return render(request, 'flickr/photos.html', context)
 
 
 @require_flickr_auth
@@ -335,4 +335,4 @@ def popular(request, userid=None):
             'photos': photos,
             'utils': flickr.flickrutils,
         }
-    return render(request, 'flickr/favourites.html', context)
+    return render(request, 'flickr/photos.html', context)
