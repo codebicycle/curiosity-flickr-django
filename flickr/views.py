@@ -40,13 +40,14 @@ def paginate(request=None, collection=None, per_page=100):
 
 class Interestingness(View):
     def get(self, request):
-        res = FLICKR.interestingness.getList()
-        photos = res['photos']['photo']
+        f = init_flickrapi(request)
+
+        response = f.interestingness.getList()
+        photos = response['photos']['photo']
 
         context = {
             'photos': photos,
-            'photo_url': photo_url,
-            'photo_page_url': photo_page_url,
+            'utils': flickr.flickrutils,
         }
         return render(request, 'flickr/photos.html', context)
 
