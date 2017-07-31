@@ -94,3 +94,4 @@ ENV/
 secrets.py
 
 *.sqlite3
+notebook/
