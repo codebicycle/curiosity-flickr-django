@@ -289,8 +289,7 @@ def flickr_auth(request):
 
 
 def logout(request):
-    if 'token' in request.session:
-        del request.session['token']
+    request.session.pop('token', None)
 
     return redirect('/')
 
