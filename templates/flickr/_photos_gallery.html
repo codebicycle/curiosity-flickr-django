@@ -12,8 +12,7 @@
           <span>{{ photo.title }}</span>
         </div>
         <div class="row">
-          <span>by <a href="{{ utils.photostream_url(photo.owner) }}"
-            class="success">{{ photo.ownername }}</a></span>
+          <a href="{{ utils.photostream_url(photo.owner) }}">by {{ photo.ownername }}</a>
         </div>
       </div>
 

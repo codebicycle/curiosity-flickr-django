@@ -29,11 +29,11 @@ body {
     position: absolute;
     margin: 0;
     transition: .2s;
-    top: -5rem;
+    top: -7rem;
 }
 
 .gallery figure:hover figcaption {
-    transform: translateY(5rem);
+    transform: translateY(7rem);
 }
 
 /* flcikr form */
