@@ -31,9 +31,8 @@ class Person(models.Model):
 
 
     @classmethod
-    def create(cls, flickrid, flickrapi):
+    def create(cls, flickrid):
         person = cls(flickrid=flickrid)
-        person.flickrapi = flickrapi
         person._update_info()
 
         return person

@@ -273,16 +273,14 @@ def flickr_auth(request):
 
     token = f.token_cache.token
     log.debug('token: {}'.format(token.__dict__))
-
     request.session['token'] = token
 
     user_id = token.user_nsid
-
     try:
         person = Person.objects.get(flickrid=user_id)
     except Person.DoesNotExist as e:
-        f = init_flickrapi(request)
-        person = Person.create(flickrid=user_id, flickrapi=f)
+        Person.flickrapi = init_flickrapi(request)
+        person = Person.create(flickrid=user_id)
         person.save()
 
     return redirect(redirect_url)
