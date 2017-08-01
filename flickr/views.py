@@ -227,7 +227,7 @@ def require_flickr_auth(view):
             token=token, store_token=False)
 
         if token is None:
-            callback_url = build_callback_url(request)
+            callback_url = _build_callback_url(request)
             f.get_request_token(oauth_callback=callback_url)
 
             authorize_url = f.auth_url(perms='read')
@@ -244,7 +244,7 @@ def require_flickr_auth(view):
     return protected_view
 
 
-def build_callback_url(request):
+def _build_callback_url(request):
     next_url = request.get_full_path()
     callback_url = request.build_absolute_uri(reverse('flickr-auth'))
     callback_url = set_query_param(callback_url, 'next', next_url)
