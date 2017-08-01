@@ -24,7 +24,7 @@ urlpatterns = [
     url(r'^interesting/$', flickr.views.Interestingness.as_view()),
     url(r'^people/$', flickr.views.PeopleView.as_view(), name='people'),
 
-    url(r'^favusers/$', flickr.views.fav_users, name='fav-users'),
+    url(r'^following/$', flickr.views.following, name='following'),
 
     url(r'^people/(?P<userid>.*)/top/?$',
         flickr.views.UserTopView.as_view(), name='top'),

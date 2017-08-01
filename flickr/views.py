@@ -4,6 +4,7 @@ from pprint import pformat
 
 from django.conf import settings
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db import IntegrityError
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, redirect, reverse
 from django.views import View
@@ -12,9 +13,9 @@ from flickrapi import FlickrAPI, FlickrError
 
 from flickr.flickrutils import photo_url, photo_page_url, photostream_url
 import flickr.flickrutils
-from flickr.utils import set_query_param
+from flickr.utils import set_query_param, get_logged_in_user_id
 from .forms import PeopleForm
-from .models import Person, Fav
+from .models import Person, Fav, Following
 
 
 log = logging.getLogger(__name__)
@@ -63,7 +64,8 @@ class PeopleView(View):
         if not form.is_valid():
             raise 'Form not valid.'
 
-        userid = self._userid(form.cleaned_data['user_id_or_url'], request)
+        userid_or_url = form.cleaned_data['user_id_or_url']
+        userid = self._userid_from_url(userid_or_url, request)
 
         if 'submit_top_photos' in request.POST:
             return redirect('top', userid=userid)
@@ -71,18 +73,9 @@ class PeopleView(View):
         if 'submit_group_photos' in request.POST:
             return redirect('groups', userid=userid)
 
-        if 'submit_fav_user' in request.POST:
-            Person.flickrapi = init_flickrapi(request)
-
-            try:
-                person = Person.objects.get(flickrid=userid)
-            except Person.DoesNotExist as e:
-                person = Person(flickrid=userid)
-                person._update_info()
-                person.save()
-
-            Fav.objects.get_or_create(person=person)
-            return redirect('fav-users')
+        if 'submit_follow' in request.POST:
+            self._follow_user(userid, request)
+            return redirect('following')
 
         if 'submit_favs' in request.POST:
             return redirect('favs', userid=userid)
@@ -91,7 +84,7 @@ class PeopleView(View):
             return redirect('popular', userid=userid)
 
 
-    def _userid(self, param, request):
+    def _userid_from_url(self, param, request):
         """
         :param: flickr user url or flickr user id:
                 https://www.FLICKR.com/photos/jellybeanzgallery
@@ -108,6 +101,22 @@ class PeopleView(View):
         response = f.urls.lookupUser(url=param)
         userid = response['user']['id']
         return userid
+
+
+    def _follow_user(self, followed_id, request):
+        Person.flickrapi = init_flickrapi(request)
+        try:
+            followed = Person.objects.get(flickrid=followed_id)
+        except Person.DoesNotExist as e:
+            followed = Person.create(flickrid=followed_id)
+            followed.save()
+
+        follower_id = get_logged_in_user_id(request)
+        following = Following(follower_id=follower_id, followed=followed)
+        try:
+            following.save()
+        except IntegrityError as e:
+            log.error(e)
 
 
 class UserGroupView(View):
@@ -341,12 +350,12 @@ def popular(request, userid=None):
     return render(request, 'flickr/photos.html', context)
 
 
-def fav_users(request):
-    favs = Fav.objects.all()
-
+def following(request):
+    user_id = get_logged_in_user_id(request)
+    followings = Following.objects.all()
     context = {
-        'favs': favs,
+        'followings': followings,
         'utils': flickr.flickrutils,
     }
 
-    return render(request, 'flickr/fav_users.html', context)
+    return render(request, 'flickr/following.html', context)
