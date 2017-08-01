@@ -260,8 +260,7 @@ def flickr_auth(request):
     verifier = request.GET.get('oauth_verifier')
     log.debug('verifier: {}'.format(verifier))
 
-    f = FlickrAPI(settings.FLICKR_KEY, settings.FLICKR_SECRET,
-        token=None, store_token=False)
+    f = init_flickrapi(request)
 
     f.flickr_oauth.resource_owner_key = request.session['request_token']
     f.flickr_oauth.resource_owner_secret = request.session['request_token_secret']
@@ -277,9 +276,16 @@ def flickr_auth(request):
 
     request.session['token'] = token
 
+    user_id = token.user_nsid
+
+    try:
+        person = Person.objects.get(flickrid=user_id)
+    except Person.DoesNotExist as e:
+        f = init_flickrapi(request)
+        person = Person.create(flickrid=user_id, flickrapi=f)
+        person.save()
+
     return redirect(redirect_url)
-
-
 
 
 def logout(request):
