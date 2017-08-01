@@ -82,6 +82,9 @@ class Following(models.Model):
     followed = models.ForeignKey(Person, on_delete=models.CASCADE,
         to_field='flickrid', related_name='+')
 
+    class Meta:
+        unique_together = ("follower", "followed")
+
     def __str__(self):
         return self.followed.info['person']['username']['_content']
 
