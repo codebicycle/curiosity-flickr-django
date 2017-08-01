@@ -12,6 +12,11 @@ log.setLevel(logging.DEBUG)
 
 
 class Person(models.Model):
+    flickrid = models.CharField(max_length=30, unique=True, db_index=True)
+    updated_at = models.DateTimeField(null=True)
+    photos = JSONField(default=list)
+    info = JSONField(null=True)
+
     flickrapi = None
 
     def _needs_update(self):
@@ -22,11 +27,16 @@ class Person(models.Model):
             return True
         return False
 
-    flickrid = models.CharField(max_length=30, unique=True, db_index=True)
-    updated_at = models.DateTimeField(null=True)
-    photos = JSONField(default=list)
-    info = JSONField(null=True)
     needs_update = property(_needs_update)
+
+
+    @classmethod
+    def create(cls, flickrid):
+        person = cls(flickrid=flickrid)
+        person._update_info()
+
+        return person
+
 
     def __str__(self):
         return self.info['person']['username']['_content']
@@ -66,9 +76,21 @@ class Person(models.Model):
         return photo_page
 
 
-class Fav(models.Model):
-    person = models.ForeignKey(Person, on_delete=models.CASCADE,
-                               to_field='flickrid')
+class Following(models.Model):
+    follower = models.ForeignKey(Person, on_delete=models.CASCADE,
+        to_field='flickrid', related_name='+')
+    followed = models.ForeignKey(Person, on_delete=models.CASCADE,
+        to_field='flickrid', related_name='+')
 
     def __str__(self):
-        return self.person.info['person']['username']['_content']
+        return self.followed.info['person']['username']['_content']
+
+
+class Fav(models.Model):
+    user = models.ForeignKey(Person, on_delete=models.CASCADE,
+                               to_field='flickrid')
+    photoid = models.CharField(max_length=30, db_index=True)
+    info = JSONField(null=True)
+
+    def __str__(self):
+        return self.info
