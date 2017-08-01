@@ -280,9 +280,6 @@ def flickr_auth(request):
     return redirect(redirect_url)
 
 
-@require_flickr_auth
-def hello(request):
-    return HttpResponse('Hello')
 
 
 def logout(request):
