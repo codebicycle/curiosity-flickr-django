@@ -95,5 +95,8 @@ class Fav(models.Model):
     photoid = models.CharField(max_length=30, db_index=True)
     info = JSONField(null=True)
 
+    class Meta:
+        unique_together = ("user", "photoid")
+
     def __str__(self):
         return self.info
