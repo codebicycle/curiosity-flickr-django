@@ -126,7 +126,7 @@ class UserGroupView(View):
         f = init_flickrapi(request)
         photos = []
         try:
-            response = f.groups.pools.getPhotos(group_id=groupid, user_id=userid)
+            response = f.groups.pools.getPhotos(group_id=groupid, user_id=userid, extras='views')
             photos = response['photos']['photo']
         except FlickrError as err:
             log.error('{} {}'.format(err, groupname))
@@ -146,7 +146,8 @@ class UserGroupsView(View):
         response = f.people.getGroups(user_id=userid)
 
         group_list = response['groups']['group']
-        log.debug('Groups of {}:\n{}'.format(userid, pformat(group_list)))
+        log.debug('{} groups for {}:\n{}'.format(len(group_list), userid,
+            pformat(group_list[:10])))
 
         pages = paginate(request, collection=group_list, per_page=25)
 
@@ -155,7 +156,7 @@ class UserGroupsView(View):
             'groups': pages.object_list,
             'pages': pages,
             'utils': flickr.flickrutils,
-    }
+        }
         return render(request, 'flickr/groups.html', context)
 
 
