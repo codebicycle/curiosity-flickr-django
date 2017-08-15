@@ -42,5 +42,8 @@ urlpatterns = [
     url(r'^flickr-auth/$', flickr.views.flickr_auth, name='flickr-auth'),
     url(r'^logout/$', flickr.views.logout),
     url(r'^favs$', flickr.views.favs),
+    url(r'^fav$', flickr.views.fav, name='fav-photos'),
     url(r'^popular/$', flickr.views.popular),
+
+    url(r'^(?P<photoid>.*)/fav$', flickr.views.PhotoFavView.as_view(), name='photo-fav'),
 ]

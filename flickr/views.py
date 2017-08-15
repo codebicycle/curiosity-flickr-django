@@ -360,3 +360,30 @@ def following(request):
     }
 
     return render(request, 'flickr/following.html', context)
+
+
+
+class PhotoFavView(View):
+    def post(self, request, photoid):
+        user_id = get_logged_in_user_id(request)
+        f = init_flickrapi(request)
+
+        if not Fav.objects.filter(user_id=user_id, photoid=photoid).exists():
+            info = f.photos.getInfo(photo_id=photoid)
+            fav = Fav(user_id=user_id, photoid=photoid, info=info)
+            fav.save()
+
+        return redirect('fav-photos')
+
+
+@require_flickr_auth
+def fav(request):
+    user_id = get_logged_in_user_id(request)
+
+    favs = Fav.objects.filter(user_id=user_id).all()
+
+    context = {
+        'photos': favs,
+        'utils': flickr.flickrutils,
+    }
+    return render(request, 'flickr/favs.html', context)
