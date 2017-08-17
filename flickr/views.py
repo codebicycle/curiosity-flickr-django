@@ -14,8 +14,8 @@ from flickrapi import FlickrAPI, FlickrError
 from flickr.flickrutils import photo_url, photo_page_url, photostream_url
 import flickr.flickrutils
 from flickr.utils import set_query_param, get_logged_in_user_id
-from .forms import PeopleForm
-from .models import Person, Fav, Following
+from flickr.forms import PeopleForm
+from flickr.models import Person, Fav, Following
 
 
 log = logging.getLogger(__name__)
