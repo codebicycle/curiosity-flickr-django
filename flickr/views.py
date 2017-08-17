@@ -5,7 +5,7 @@ from pprint import pformat
 from django.conf import settings
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import IntegrityError
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound
 from django.shortcuts import render, redirect, reverse
 from django.views import View
 from django.views.generic import DeleteView
@@ -407,15 +407,16 @@ def method_info(request, method_name):
 
 class FlickrExplore(View):
     def get(self, request, method_name):
-        #TODO: Validate method_name
-
         f = init_flickrapi(request)
-        response = f.reflection.getMethodInfo(method_name=method_name)
+
+        try:
+            response = f.reflection.getMethodInfo(method_name=method_name)
+        except FlickrError as err:
+            log.error('{}'.format(err))
+            return HttpResponseNotFound('<h1>404 Not Found</h1>')
+
         response_status = response['stat']
         log.debug('flickr.reflection.getMethodInfo status: {}'.format(response_status))
-
-        if response_status != 'ok':
-            return HttpResponse('Bad response')
 
         form = FlickrForm(extra=response)
 
@@ -423,3 +424,17 @@ class FlickrExplore(View):
             'form': form,
         }
         return render(request, 'flickr/flickr_explore.html', context)
+
+
+    def post(self, request, method_name):
+        f = init_flickrapi(request)
+        response = f.reflection.getMethodInfo(method_name=method_name)
+
+        form = FlickrForm(request.POST, extra=response)
+        if form.is_valid():
+            log.debug('Form is valid:\n{}'.format(form.cleaned_data))
+        else:
+            log.debug('Invalid form.')
+
+        response = f.do_flickr_call(_method_name=method_name, **form.cleaned_data)
+        return HttpResponse('<pre>'+ pformat(response) + '</pre>')
