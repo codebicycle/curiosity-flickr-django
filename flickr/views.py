@@ -399,3 +399,11 @@ def method_info(request, method_name):
         'method_name': method_name,
     }
     return render(request, 'flickr/method_info.html', context)
+
+
+def api(request, method_name):
+    # TODO: validate method name
+
+    url_template = 'https://www.flickr.com/services/api/{}.html'
+    url = url_template.format(method_name)
+    return redirect(url)
