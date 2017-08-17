@@ -389,22 +389,6 @@ def fav(request):
     return render(request, 'flickr/favs.html', context)
 
 
-def method_info(request, method_name):
-    f = init_flickrapi(request)
-
-    response = f.reflection.getMethodInfo(method_name=method_name)
-
-    url_template = 'https://www.flickr.com/services/api/{}.html'
-    url = url_template.format(method_name)
-
-    context = {
-        'response': response,
-        'method_name': method_name,
-        'documentation_url': url,
-    }
-    return render(request, 'flickr/method_info.html', context)
-
-
 class FlickrExplore(View):
     def get(self, request, method_name):
         f = init_flickrapi(request)
