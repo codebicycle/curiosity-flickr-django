@@ -49,5 +49,5 @@ urlpatterns = [
 
     url(r'^info/(?P<method_name>.*)$', flickr.views.method_info),
 
-    url(r'^api/(?P<method_name>.*)$', flickr.views.api),
+    url(r'^api/(?P<method_name>.*)$', flickr.views.FlickrExplore.as_view()),
 ]

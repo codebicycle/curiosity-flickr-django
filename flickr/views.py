@@ -14,7 +14,7 @@ from flickrapi import FlickrAPI, FlickrError
 from flickr.flickrutils import photo_url, photo_page_url, photostream_url
 import flickr.flickrutils
 from flickr.utils import set_query_param, get_logged_in_user_id
-from flickr.forms import PeopleForm
+from flickr.forms import PeopleForm, FlickrForm
 from flickr.models import Person, Fav, Following
 
 
@@ -405,9 +405,21 @@ def method_info(request, method_name):
     return render(request, 'flickr/method_info.html', context)
 
 
-def api(request, method_name):
-    # TODO: validate method name
+class FlickrExplore(View):
+    def get(self, request, method_name):
+        #TODO: Validate method_name
 
-    url_template = 'https://www.flickr.com/services/api/{}.html'
-    url = url_template.format(method_name)
-    return redirect(url)
+        f = init_flickrapi(request)
+        response = f.reflection.getMethodInfo(method_name=method_name)
+        response_status = response['stat']
+        log.debug('flickr.reflection.getMethodInfo status: {}'.format(response_status))
+
+        if response_status != 'ok':
+            return HttpResponse('Bad response')
+
+        form = FlickrForm(extra=response)
+
+        context = {
+            'form': form,
+        }
+        return render(request, 'flickr/flickr_explore.html', context)
