@@ -387,3 +387,15 @@ def fav(request):
         'utils': flickr.flickrutils,
     }
     return render(request, 'flickr/favs.html', context)
+
+
+def method_info(request, method_name):
+    f = init_flickrapi(request)
+
+    response = f.reflection.getMethodInfo(method_name=method_name)
+
+    context = {
+        'response': response,
+        'method_name': method_name,
+    }
+    return render(request, 'flickr/method_info.html', context)

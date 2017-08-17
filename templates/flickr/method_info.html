@@ -1,0 +1,12 @@
+{% extends 'base.html'  %}
+
+{% block content %}
+
+{% set flickr_url_template = 'https://www.flickr.com/services/api/{}.html' %}
+<div class="container">
+  <a href="{{ flickr_url_template.format(method_name) }}">{{ method_name }}</a>
+
+  <pre>{{ response|pprint }}</pre>
+</div>
+
+{% endblock %}
