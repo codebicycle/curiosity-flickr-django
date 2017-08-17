@@ -18,3 +18,8 @@ class FlickrForm(forms.Form):
 			self.fields[name] = forms.CharField()
 			self.fields[name].help_text = argument['_content']
 			self.fields[name].required = not argument['optional']
+
+		try:
+			self.fields['api_key'].required = False
+		except KeyError:
+			pass
