@@ -16,3 +16,5 @@ class FlickrForm(forms.Form):
 		for argument in arguments:
 			name = argument['name']
 			self.fields[name] = forms.CharField()
+			self.fields[name].help_text = argument['_content']
+			self.fields[name].required = not argument['optional']
