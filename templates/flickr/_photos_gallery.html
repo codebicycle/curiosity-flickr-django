@@ -24,7 +24,9 @@
           </button>
         </form>
 
+        {% if 'views' in photo %}
         <span>{{ utils.cool_number(photo.views) }}</span>
+        {% endif %}
       </div>
     </figcaption>
 
