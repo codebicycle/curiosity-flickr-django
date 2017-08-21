@@ -11,9 +11,11 @@
         <div class="row">
           <span>{{ photo.title }}</span>
         </div>
+        {% if photo.ownername %}
         <div class="row">
           <a href="{{ utils.photostream_url(photo.owner) }}">by {{ photo.ownername }}</a>
         </div>
+        {% endif %}
       </div>
 
       <div class="align-self-end">
