@@ -6,12 +6,6 @@
     {% include 'flickr/_people_form.html' %}
   {% endif %}
 
-  {% if not photos %}
-  <div class="container">
-    <h3>No photos to show.</h3>
-  </div>
-  {% endif %}
-
   {% include 'flickr/_pagination.html' %}
   {% include 'flickr/_photos_gallery.html' %}
   {% include 'flickr/_pagination.html' %}
