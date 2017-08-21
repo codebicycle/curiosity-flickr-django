@@ -1,0 +1,12 @@
+{% extends 'base.html'  %}
+
+{% block content %}
+  {% if response.photos %}
+    {% set photos = response['photos']['photo'] %}
+
+    {% include 'flickr/_photos_gallery.html' %}
+  {% endif %}
+
+  <pre>{{ response|pprint }}</pre>
+
+{% endblock %}

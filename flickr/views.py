@@ -421,4 +421,10 @@ class FlickrExplore(View):
             log.debug('Invalid form.')
 
         response = f.do_flickr_call(_method_name=method_name, **form.cleaned_data)
-        return HttpResponse('<pre>'+ pformat(response) + '</pre>')
+
+        context = {
+            'response': response,
+            'utils': flickr.flickrutils,
+        }
+
+        return render(request, 'flickr/api_response.html', context)
