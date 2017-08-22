@@ -47,5 +47,5 @@ urlpatterns = [
 
     url(r'^(?P<photoid>.*)/fav$', flickr.views.PhotoFavView.as_view(), name='photo-fav'),
 
-    url(r'^(?P<method_name>flickr\..*)$', flickr.views.FlickrExplore.as_view()),
+    url(r'^(?P<method_name>flickr\..*)$', flickr.views.FlickrExplore.as_view(), name='flickr-explore'),
 ]

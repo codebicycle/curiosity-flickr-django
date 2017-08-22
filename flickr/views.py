@@ -390,31 +390,38 @@ def fav(request):
 
 
 class FlickrExplore(View):
-    def get(self, request, method_name):
-        f = init_flickrapi(request)
+    def get(self, request, method_name, **kwargs):
 
-        try:
-            response = f.reflection.getMethodInfo(method_name=method_name)
-        except FlickrError as err:
-            log.error('{}'.format(err))
-            return HttpResponseNotFound('<h1>404 Not Found</h1>')
+        form = kwargs.get('form')
 
-        response_status = response['stat']
-        log.debug('flickr.reflection.getMethodInfo status: {}'.format(response_status))
+        if not form:
+            f = init_flickrapi(request)
+            try:
+                method_info = f.reflection.getMethodInfo(method_name=method_name)
+            except FlickrError as err:
+                log.error('{}'.format(err))
+                return HttpResponseNotFound('<h1>404 Not Found</h1>')
 
-        form = FlickrForm(extra=response)
+            status = method_info['stat']
+            log.debug('flickr.reflection.getMethodInfo status: {}'.format(status))
+
+            form = FlickrForm(extra=method_info)
+
+        response = kwargs.get('response')
 
         context = {
             'form': form,
+            'response': response,
+            'utils': flickr.flickrutils,
         }
         return render(request, 'flickr/flickr_explore.html', context)
 
 
     def post(self, request, method_name):
         f = init_flickrapi(request)
-        response = f.reflection.getMethodInfo(method_name=method_name)
+        method_info = f.reflection.getMethodInfo(method_name=method_name)
 
-        form = FlickrForm(request.POST, extra=response)
+        form = FlickrForm(request.POST, extra=method_info)
         if form.is_valid():
             log.debug('Form is valid:\n{}'.format(form.cleaned_data))
         else:
@@ -422,9 +429,4 @@ class FlickrExplore(View):
 
         response = f.do_flickr_call(_method_name=method_name, **form.cleaned_data)
 
-        context = {
-            'response': response,
-            'utils': flickr.flickrutils,
-        }
-
-        return render(request, 'flickr/api_response.html', context)
+        return self.get(request, method_name=method_name, response=response, form=form)
