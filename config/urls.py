@@ -40,6 +40,7 @@ urlpatterns = [
         flickr.views.UserGroupView.as_view()),
 
     url(r'^flickr-auth/$', flickr.views.flickr_auth, name='flickr-auth'),
+    url(r'^auth/$', flickr.views.auth),
     url(r'^logout/$', flickr.views.logout),
     url(r'^favs$', flickr.views.favs),
     url(r'^fav$', flickr.views.fav, name='fav-photos'),

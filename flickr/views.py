@@ -296,9 +296,14 @@ def flickr_auth(request):
     return redirect(redirect_url)
 
 
+@require_flickr_auth
+def auth(request):
+    request.session.pop('token', None)
+    return redirect('/')
+
+
 def logout(request):
     request.session.pop('token', None)
-
     return redirect('/')
 
 
