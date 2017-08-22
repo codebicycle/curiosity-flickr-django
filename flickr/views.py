@@ -393,19 +393,11 @@ class FlickrExplore(View):
     def get(self, request, method_name, **kwargs):
 
         form = kwargs.get('form')
-
         if not form:
-            f = init_flickrapi(request)
             try:
-                method_info = f.reflection.getMethodInfo(method_name=method_name)
-            except FlickrError as err:
-                log.error('{}'.format(err))
+                form = self._dynamic_form(reqest, method_name)
+            except FlickrError:
                 return HttpResponseNotFound('<h1>404 Not Found</h1>')
-
-            status = method_info['stat']
-            log.debug('flickr.reflection.getMethodInfo status: {}'.format(status))
-
-            form = FlickrForm(extra=method_info)
 
         response = kwargs.get('response')
 
@@ -422,6 +414,7 @@ class FlickrExplore(View):
         method_info = f.reflection.getMethodInfo(method_name=method_name)
 
         form = FlickrForm(request.POST, extra=method_info)
+
         if form.is_valid():
             log.debug('Form is valid:\n{}'.format(form.cleaned_data))
         else:
@@ -430,3 +423,23 @@ class FlickrExplore(View):
         response = f.do_flickr_call(_method_name=method_name, **form.cleaned_data)
 
         return self.get(request, method_name=method_name, response=response, form=form)
+
+
+    def _dynamic_form(self, request, method_name):
+        method_info = self._get_method_info(request, method_name)
+        form = FlickrForm(extra=method_info)
+        return form
+
+
+    def _get_method_info(self, request, method_name):
+        f = init_flickrapi(request)
+        try:
+            method_info = f.reflection.getMethodInfo(method_name=method_name)
+        except FlickrError as err:
+            log.error('{}'.format(err))
+            raise err
+
+        status = method_info['stat']
+        log.debug('flickr.reflection.getMethodInfo status: {}'.format(status))
+
+        return method_info
