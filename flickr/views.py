@@ -400,7 +400,7 @@ class FlickrExplore(View):
         form = kwargs.get('form')
         if not form:
             try:
-                form = self._dynamic_form(reqest, method_name)
+                form = self._dynamic_form(request, method_name)
             except FlickrError:
                 return HttpResponseNotFound('<h1>404 Not Found</h1>')
 
