@@ -90,22 +90,6 @@ class PeopleView(View):
         return userid
 
 
-    def _follow_user(self, followed_id, request):
-        Person.flickrapi = init_flickrapi(request)
-        try:
-            followed = Person.objects.get(flickrid=followed_id)
-        except Person.DoesNotExist as e:
-            followed = Person.create(flickrid=followed_id)
-            followed.save()
-
-        follower_id = get_logged_in_user_id(request)
-        following = Following(follower_id=follower_id, followed=followed)
-        try:
-            following.save()
-        except IntegrityError as e:
-            log.error(e)
-
-
 class UserGroupView(View):
     def post(self, request, userid, groupid):
         groupname = request.POST.get('group[name]')
@@ -341,18 +325,6 @@ def popular(request, userid=None):
             'utils': flickr.flickrutils,
         }
     return render(request, 'flickr/photos.html', context)
-
-
-def following(request):
-    user_id = get_logged_in_user_id(request)
-    followings = Following.objects.all()
-    context = {
-        'followings': followings,
-        'utils': flickr.flickrutils,
-    }
-
-    return render(request, 'flickr/following.html', context)
-
 
 
 class PhotoFavView(View):
