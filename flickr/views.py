@@ -54,9 +54,6 @@ class PeopleView(View):
         userid_or_url = form.cleaned_data['user_id_or_url']
         userid = self._userid_from_url(userid_or_url, request)
 
-        if 'submit_top_photos' in request.POST:
-            return redirect('top', userid=userid)
-
         if 'submit_group_photos' in request.POST:
             return redirect('groups', userid=userid)
 
@@ -120,38 +117,6 @@ class UserGroupsView(View):
         }
         return render(request, 'flickr/groups.html', context)
 
-
-class UserTopView(View):
-    def get(self, request, userid):
-        Person.flickrapi = init_flickrapi(request)
-
-        try:
-            person = Person.objects.get(flickrid=userid)
-        except Person.DoesNotExist as e:
-            person = Person(flickrid=userid)
-
-        photos = person.photos
-
-        first_page = person._get_photo_page(page=1)
-        pages = first_page['photos']['pages']
-        total = first_page['photos']['total']
-
-
-        if person.needs_update:
-            person.update()
-
-        top_views = sorted(person.photos, reverse=True,
-                           key=(lambda x: int(x['views'])))
-        log.debug('Top_views\n{}'.format(pformat(top_views)))
-
-        pages = paginate(request, collection=top_views,  per_page=100)
-
-        context = {
-            'photos': pages.object_list,
-            'pages': pages,
-            'utils': flickr.flickrutils,
-        }
-        return render(request, 'flickr/photos.html', context)
 
 # Flickr auth
 
