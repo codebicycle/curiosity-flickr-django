@@ -1,4 +1,4 @@
-Django==1.11
-flickrapi==2.3
-Jinja2==2.8
-psycopg2==2.7.3
+Django>=1.11
+Jinja2>=2.8
+psycopg2>=2.7.3
+git+git://github.com/sybrenstuvel/flickrapi.git
