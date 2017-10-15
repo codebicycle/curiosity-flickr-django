@@ -8,18 +8,18 @@ class PeopleForm(forms.Form):
 
 
 class FlickrForm(forms.Form):
-	def __init__(self, *args, **kwargs):
-		extra = kwargs.pop('extra')
-		super().__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        extra = kwargs.pop('extra')
+        super().__init__(*args, **kwargs)
 
-		arguments = extra['arguments']['argument']
-		for argument in arguments:
-			name = argument['name']
-			self.fields[name] = forms.CharField()
-			self.fields[name].help_text = argument['_content']
-			self.fields[name].required = not argument['optional']
+        arguments = extra['arguments']['argument']
+        for argument in arguments:
+            name = argument['name']
+            self.fields[name] = forms.CharField()
+            self.fields[name].help_text = argument['_content']
+            self.fields[name].required = not argument['optional']
 
-		try:
-			self.fields['api_key'].required = False
-		except KeyError:
-			pass
+        try:
+            self.fields['api_key'].required = False
+        except KeyError:
+            pass
