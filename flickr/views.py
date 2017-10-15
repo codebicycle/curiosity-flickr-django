@@ -17,6 +17,7 @@ import flickr.flickrutils
 from flickr.utils import set_query_param, get_logged_in_user_id
 from flickr.forms import PeopleForm, FlickrForm
 
+logging.basicConfig()
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
@@ -123,15 +124,14 @@ def require_flickr_auth(view):
 
     def protected_view(request, *args, **kwargs):
         token = request.session.get('token')
-
-        f = FlickrAPI(settings.FLICKR_KEY, settings.FLICKR_SECRET,
-            token=token, store_token=False)
-
         if token is None:
+            f = FlickrAPI(settings.FLICKR_KEY, settings.FLICKR_SECRET,
+                token=token, store_token=False)
             callback_url = _build_callback_url(request)
             f.get_request_token(oauth_callback=callback_url)
 
             authorize_url = f.auth_url(perms='read')
+            log.debug('require_flickr_auth()')
             log.debug('authorize URL: {}'.format(authorize_url))
 
             request.session['request_token'] = f.flickr_oauth.resource_owner_key
@@ -183,7 +183,6 @@ def flickr_auth(request):
 
 @require_flickr_auth
 def auth(request):
-    request.session.pop('token', None)
     return redirect('/')
 
 
