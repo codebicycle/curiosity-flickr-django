@@ -32,18 +32,12 @@ urlpatterns = [
     url(r'^people/(?P<userid>.*)/groups/?$',
         flickr.views.UserGroupsView.as_view(), name='groups'),
 
-    url(r'^people/(?P<userid>.*)/favs/?$', flickr.views.favs, name='favs'),
-
     url(r'^people/(?P<userid>.*)/(?P<groupid>.*)$',
         flickr.views.UserGroupView.as_view()),
 
     url(r'^flickr-auth/$', flickr.views.flickr_auth, name='flickr-auth'),
     url(r'^auth/$', flickr.views.auth),
     url(r'^logout/$', flickr.views.logout),
-    url(r'^flickr-favs$', flickr.views.favs),
-    url(r'^favs$', flickr.views.fav, name='fav-photos'),
-
-    url(r'^(?P<photoid>.*)/fav$', flickr.views.PhotoFavView.as_view(), name='photo-fav'),
 
     url(r'^(?P<method_name>flickr\..*)$', flickr.views.FlickrExplore.as_view(), name='flickr-explore'),
 ]

@@ -19,13 +19,6 @@
       </div>
 
       <div class="align-self-end">
-        <form method="post" action="{{ url('photo-fav', kwargs={'photoid': photo.id}) }}">
-          {{ csrf_input }}
-          <button class="btn btn-link">
-            <i class="fa fa-star-o" aria-hidden="true"></i>
-          </button>
-        </form>
-
         {% if 'views' in photo %}
         <span>{{ utils.cool_number(photo.views) }}</span>
         {% endif %}

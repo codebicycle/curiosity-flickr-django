@@ -16,7 +16,7 @@ from flickr.flickrutils import photo_url, photo_page_url, photostream_url
 import flickr.flickrutils
 from flickr.utils import set_query_param, get_logged_in_user_id
 from flickr.forms import PeopleForm, FlickrForm
-from flickr.models import Person, Fav, Following
+from flickr.models import Person
 
 
 log = logging.getLogger(__name__)
@@ -59,13 +59,6 @@ class PeopleView(View):
 
         if 'submit_group_photos' in request.POST:
             return redirect('groups', userid=userid)
-
-        if 'submit_follow' in request.POST:
-            self._follow_user(userid, request)
-            return redirect('following')
-
-        if 'submit_favs' in request.POST:
-            return redirect('favs', userid=userid)
 
 
     def _userid_from_url(self, param, request):
@@ -160,39 +153,6 @@ class UserTopView(View):
         }
         return render(request, 'flickr/photos.html', context)
 
-
-# class FavView(View):
-#     def get(self, request):
-#         favs = Fav.objects.all()
-
-#         selection = []
-#         for fav in favs:
-#             if fav.person.needs_update:
-#                 fav.person.update()
-
-#             person = fav.person
-#             flickrid = person.flickrid
-#             username = person.info['person']['username']['_content']
-#             photos = person.photos
-#             latest = sorted(photos, reverse=True,
-#                             key=(lambda x: int(x['dateupload'])))[:10]
-
-#             selection.append({
-#                 'flickrid': flickrid,
-#                 'username': username,
-#                 'photos': latest
-#             })
-
-#         context = {
-#             'favs': selection,
-#             'photo_url': photo_url,
-#             'photo_page_url': photo_page_url,
-#             'photostream_url': photostream_url,
-#         }
-#         # context = {'context': context}
-#         return render(request, 'flickr/fav.html', context)
-
-
 # Flickr auth
 
 def require_flickr_auth(view):
@@ -285,49 +245,6 @@ def init_flickrapi(request):
 
 
 # Flickr API calls
-
-@require_flickr_auth
-def favs(request, userid=None):
-    f = init_flickrapi(request)
-    page = request.GET.get('page', 1)
-
-    response = f.favorites.getList(user_id=userid, page=page, extras='owner_name,views')
-    log.debug('Response\n{}'.format(pformat(response)))
-
-    photos = response['photos']['photo']
-
-    context = {
-            'photos': photos,
-            'utils': flickr.flickrutils,
-        }
-    return render(request, 'flickr/photos.html', context)
-
-
-class PhotoFavView(View):
-    def post(self, request, photoid):
-        user_id = get_logged_in_user_id(request)
-        f = init_flickrapi(request)
-
-        if not Fav.objects.filter(user_id=user_id, photoid=photoid).exists():
-            info = f.photos.getInfo(photo_id=photoid)
-            fav = Fav(user_id=user_id, photoid=photoid, info=info)
-            fav.save()
-
-        return redirect('fav-photos')
-
-
-@require_flickr_auth
-def fav(request):
-    user_id = get_logged_in_user_id(request)
-
-    favs = Fav.objects.filter(user_id=user_id).all()
-
-    context = {
-        'photos': favs,
-        'utils': flickr.flickrutils,
-    }
-    return render(request, 'flickr/favs.html', context)
-
 
 class FlickrExplore(View):
     def get(self, request, method_name, **kwargs):
