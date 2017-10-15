@@ -14,8 +14,9 @@
   </head>
   <body>
 
-    <nav class="navbar navbar-light bg-faded mb-4">
+    <nav class="navbar navbar-light bg-light mb-4">
       <a class="navbar-brand" href="{{ url('home') }}">Curiosity Flickr</a>
+      <span class="navbar-text">{{ request.session.token.username if 'token' in request.session else '' }}</span>
     </nav>
 
     {% block content %}{% endblock %}
