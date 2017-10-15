@@ -15,12 +15,15 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from django.views.generic import RedirectView
 
 import flickr.views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^$', flickr.views.PeopleView.as_view()),
+    url(r'^$', RedirectView.as_view(pattern_name='api'), name='home'),
+    url(r'^api/$', flickr.views.api, name='api'),
+
     url(r'^interesting/$', flickr.views.Interestingness.as_view()),
     url(r'^people/$', flickr.views.PeopleView.as_view(), name='people'),
 
@@ -42,8 +45,8 @@ urlpatterns = [
     url(r'^flickr-auth/$', flickr.views.flickr_auth, name='flickr-auth'),
     url(r'^auth/$', flickr.views.auth),
     url(r'^logout/$', flickr.views.logout),
-    url(r'^favs$', flickr.views.favs),
-    url(r'^fav$', flickr.views.fav, name='fav-photos'),
+    url(r'^flickr-favs$', flickr.views.favs),
+    url(r'^favs$', flickr.views.fav, name='fav-photos'),
     url(r'^popular/$', flickr.views.popular),
 
     url(r'^(?P<photoid>.*)/fav$', flickr.views.PhotoFavView.as_view(), name='photo-fav'),

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+	<h2>API Methods</h2>
+	{% for label, method_group in methods %}
+		<h3>{{ label }}</h3>
+		<ul>
+		{% for method in method_group %}
+			<li>
+				<a href="{{ url('flickr-explore', args=[method]) }}">{{ method }}</a>
+			</li>
+		{% endfor %}
+		</ul>
+	{% endfor %}
+</div>
+
+{% endblock content %}

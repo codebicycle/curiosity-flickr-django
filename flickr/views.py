@@ -1,3 +1,4 @@
+import itertools
 import logging
 from urllib.parse import unquote, urlparse
 from pprint import pformat
@@ -448,3 +449,22 @@ class FlickrExplore(View):
         log.debug('flickr.reflection.getMethodInfo status: {}'.format(status))
 
         return method_info
+
+
+def api(request):
+    f = init_flickrapi(request)
+    response = f.reflection.getMethods()
+    status = response.get('stat')
+
+    if status != 'ok':
+        log.debug(f'Bad status\n{response}')
+
+    methods = (method['_content'] for method in response['methods']['method'])
+    between_dots = lambda _str: _str[7: _str.rindex('.')]
+    methods = itertools.groupby(methods, key=between_dots)
+
+    context = {
+        'methods': methods,
+    }
+
+    return render(request, 'flickr/api.html', context)
