@@ -67,9 +67,6 @@ class PeopleView(View):
         if 'submit_favs' in request.POST:
             return redirect('favs', userid=userid)
 
-        if 'submit_popular' in request.POST:
-            return redirect('popular', userid=userid)
-
 
     def _userid_from_url(self, param, request):
         """
@@ -295,27 +292,6 @@ def favs(request, userid=None):
     page = request.GET.get('page', 1)
 
     response = f.favorites.getList(user_id=userid, page=page, extras='owner_name,views')
-    log.debug('Response\n{}'.format(pformat(response)))
-
-    photos = response['photos']['photo']
-
-    context = {
-            'photos': photos,
-            'utils': flickr.flickrutils,
-        }
-    return render(request, 'flickr/photos.html', context)
-
-
-@require_flickr_auth
-def popular(request, userid=None):
-    """sort : faves, views, comments or interesting. Deafults to views."""
-
-    f = init_flickrapi(request)
-    page = request.GET.get('page', 1)
-    sort = request.GET.get('sort', 'views')
-
-    response = f.photos.getPopular(user_id=userid, sort=sort,
-        page=page, extras='owner_name,views')
     log.debug('Response\n{}'.format(pformat(response)))
 
     photos = response['photos']['photo']
