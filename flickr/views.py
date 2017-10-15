@@ -229,9 +229,7 @@ class FlickrExplore(View):
         form = FlickrForm(request.POST, extra=method_info)
 
         if form.is_valid():
-            log.debug('Form is valid:\n{}'.format(form.cleaned_data))
-        else:
-            log.debug('Invalid form.')
+            log.debug(f'form: {form.cleaned_data}')
 
         response = f.do_flickr_call(_method_name=method_name, **form.cleaned_data)
 

@@ -23,3 +23,14 @@ class FlickrForm(forms.Form):
             self.fields['api_key'].required = False
         except KeyError:
             pass
+
+    def clean(self):
+        """Remove keys with corresponding empty values '' from cleaned_data
+        Fixes bug: if argument max_fave_date is '', no errors are thrown but the results are empty.
+        """
+        cleaned_data = super().clean()
+        clone = cleaned_data.copy()
+        for key, value in clone.items():
+            if value == '':
+                del cleaned_data[key]
+        return cleaned_data
