@@ -16,15 +16,7 @@
   <body>
 
     <nav class="navbar navbar-light bg-faded mb-4">
-      <form action='/people/' method="post" class="form-inline">
-        {{ csrf_input }}
-        <input class="form-control col-6" id="navbar-input" type="text" name="user_id_or_url" placeholder="User id or URL" required autofocus>
-
-        <button class="btn btn-outline-success btn-sm ml-2" type="submit" name="submit_popular">Popular</button>
-        <button class="btn btn-outline-success btn-sm ml-2" type="submit" name="submit_favs">Favourites</button>
-        <button class="btn btn-outline-success btn-sm ml-2" type="submit" name="submit_group_photos">Groups Photos</button>
-        <button class="btn btn-outline-success btn-sm ml-2" type="submit" name="submit_follow">Follow</button>
-      </form>
+      <a class="navbar-brand" href="{{ url('home') }}">Curiosity Flickr</a>
     </nav>
 
     {% block content %}{% endblock %}
