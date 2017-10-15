@@ -38,20 +38,6 @@ def paginate(request=None, collection=None, per_page=100):
     return pages
 
 
-class Interestingness(View):
-    def get(self, request):
-        f = init_flickrapi(request)
-
-        response = f.interestingness.getList()
-        photos = response['photos']['photo']
-
-        context = {
-            'photos': photos,
-            'utils': flickr.flickrutils,
-        }
-        return render(request, 'flickr/photos.html', context)
-
-
 class PeopleView(View):
     def get(self, request):
         form = PeopleForm()

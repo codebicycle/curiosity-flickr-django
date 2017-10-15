@@ -24,7 +24,6 @@ urlpatterns = [
     url(r'^$', RedirectView.as_view(pattern_name='api'), name='home'),
     url(r'^api/$', flickr.views.api, name='api'),
 
-    url(r'^interesting/$', flickr.views.Interestingness.as_view()),
     url(r'^people/$', flickr.views.PeopleView.as_view(), name='people'),
 
     url(r'^following/$', flickr.views.following, name='following'),
