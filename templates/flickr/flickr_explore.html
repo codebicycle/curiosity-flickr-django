@@ -2,7 +2,7 @@
 
 {% block content %}
 
-	<div class="container">
+	<div class="container mb-4">
 		<form method='post'>
 			{{ csrf_input }}
 			<table>
@@ -13,13 +13,15 @@
 		</form>
 	</div>
 
-
   {% if response.photos %}
-    {% set photos = response['photos']['photo'] %}
-
-    {% include 'flickr/_photos_gallery.html' %}
+		<div class="mb-4">
+      {% set photos = response['photos']['photo'] %}
+      {% include 'flickr/_photos_gallery.html' %}
+		</div>
   {% endif %}
 
-  <pre>{{ response|pprint }}</pre>
+	<div class="container">
+		<pre>{{ response|pprint if response else '' }}</pre>
+	</div>
 
 {% endblock %}
