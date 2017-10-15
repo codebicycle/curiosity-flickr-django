@@ -16,8 +16,6 @@ from flickr.flickrutils import photo_url, photo_page_url, photostream_url
 import flickr.flickrutils
 from flickr.utils import set_query_param, get_logged_in_user_id
 from flickr.forms import PeopleForm, FlickrForm
-from flickr.models import Person
-
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -179,12 +177,6 @@ def flickr_auth(request):
     request.session['token'] = token
 
     user_id = token.user_nsid
-    try:
-        person = Person.objects.get(flickrid=user_id)
-    except Person.DoesNotExist as e:
-        Person.flickrapi = init_flickrapi(request)
-        person = Person.create(flickrid=user_id)
-        person.save()
 
     return redirect(redirect_url)
 
